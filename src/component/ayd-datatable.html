@@ -1,0 +1,150 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+
+<dom-module id="ayd-datatable">
+    <template>
+        <style>
+            table {
+                width: 100%;
+                @apply --paper-font-common-base;
+                font-size: 13px;
+                opacity: var(--dark-primary-opacity);
+                text-align: left;
+                border-collapse: collapse;
+            }
+
+            th + th {
+                font-size: 12px;
+                font-weight: 500;
+                opacity: var(--dark-secondary-opacity);
+                height: 56px;
+            }
+
+            td:first-of-type, th:first-of-type {
+                padding: 0 24px;
+                width: 1px;
+            }
+
+            td:last-of-type, th:last-of-type {
+                padding-right: 24px;
+            }
+
+            td {
+                height: 48px;
+                border-top: solid 1px var(--divider-color);
+            }
+
+            tbody tr:hover {
+                background-color: var(--paper-grey-200);
+            }
+
+            tr.selected {
+                background-color: var(--paper-grey-100);
+            }
+
+            paper-checkbox {
+                width: 18px;
+                --paper-checkbox-checked-color: var(--accent-color);
+            }
+
+        </style>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>
+                        <paper-checkbox on-change="_onMainCheckboxChanged"></paper-checkbox>
+                    </th>
+                    <template is="dom-repeat" items="[[_getFieldHeaders()]]" as="header">
+                        <th>[[header]]</th>
+                    </template>
+                </tr>
+            </thead>
+
+            <tbody>
+                <template is="dom-repeat" items="[[rows]]" as="row">
+                    <tr data-key$=[[row.key]]>
+                        <td>
+                            <paper-checkbox on-change="_onCheckboxChanged"></paper-checkbox>
+                        </td>
+                        <template is="dom-repeat" items="[[_getFieldKeys()]]" as="fieldKey">
+                            <td>[[_getData(row, fieldKey)]]</td>
+                        </template>
+                    </tr>
+                </template>
+            </tbody>
+
+        </table>
+
+    </template>
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class AydDatatable extends Polymer.Element {
+            static get is() {
+                return 'ayd-datatable';
+            }
+
+            static get properties() {
+                return {
+                    selectedKeys: {
+                        type: Array,
+                        value: () => [],
+                        readOnly: true,
+                        notify: true
+                    },
+                    "rows": {
+                        "type": Array
+                    },
+                    "fields": {
+                        "type": Array
+                    }
+                }
+            }
+
+            _getData(row, field) {
+                return row[field];
+            }
+
+            _getFieldKeys() {
+                return Object.keys(this.fields);
+            }
+
+            _getFieldHeaders() {
+                return Object.values(this.fields);
+            }
+
+            _onMainCheckboxChanged(e) {
+                const allCheckboxes = this.shadowRoot.querySelectorAll('tbody paper-checkbox');
+                const checked = e.target.checked;
+                allCheckboxes.forEach(checkbox => {
+                    checkbox.checked = checked;
+                    this.__checkboxEffects(checkbox);
+                });
+            }
+
+            _onCheckboxChanged(e) {
+                this.__checkboxEffects(e.target);
+            }
+
+            __checkboxEffects(checkbox) {
+                const parentRow = checkbox.parentElement.parentElement;
+                const key = parentRow.dataset.key;
+                if(checkbox.checked) {
+                    parentRow.classList.add('selected');
+                    if(this.get('selectedKeys').indexOf(key) === -1) {
+                        this.push('selectedKeys', key);
+                    }
+                } else {
+                    parentRow.classList.remove('selected');
+                    this.splice('selectedKeys', this.get('selectedKeys').indexOf(key), 1);
+                }
+            }
+
+        }
+        customElements.define(AydDatatable.is, AydDatatable);
+    </script>
+</dom-module>

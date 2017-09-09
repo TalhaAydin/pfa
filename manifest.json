@@ -1,0 +1,7 @@
+{
+  "name": "personal-finance",
+  "short_name": "personal-finance",
+  "description": "Personal finance application.",
+  "start_url": "/",
+  "display": "standalone"
+}

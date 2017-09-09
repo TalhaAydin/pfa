@@ -1,0 +1,16 @@
+{
+  "name": "personal-finance",
+  "version": "0.0.1",
+  "description": "Personal finance application.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "polymer serve -o",
+    "test": "polymer test"
+  },
+  "author": "Talha Aydin <talha@aydin.pro>",
+  "license": "ISC",
+  "devDependencies": {}
+}

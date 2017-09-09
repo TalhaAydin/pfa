@@ -1,0 +1,170 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">  
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../../bower_components/app-layout/app-layout.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="./pf-transactions.html">
+
+<dom-module id="pf-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      app-header {
+        background-color: var(--primary-color);
+      }
+
+      app-header app-toolbar [main-title] {
+        @apply --paper-font-title;
+        color: var(--dark-theme-text-color);
+      }
+
+      app-header app-toolbar paper-icon-button {
+        color: var(--dark-theme-text-color);
+        --paper-icon-button-ink-color: var(--dark-theme-text-color);
+      }
+
+      app-header-layout main {
+        padding: 16px;
+      }
+
+      app-drawer > paper-listbox {
+        margin-top: 64px;
+      }
+
+      app-drawer {
+        border-right: solid 1px var(--divider-color);
+      }
+
+      app-drawer paper-item {
+        border-bottom: solid 1px var(--divider-color);
+        @apply --paper-font-menu;
+        cursor: pointer;
+        --paper-item-selected: {
+          color: var(--primary-color);
+        }
+      }
+
+    </style>
+    
+      <app-header-layout fullbleed>
+        <app-header fixed slot="header">
+          <app-toolbar>
+            <div main-title>
+              [[title]]
+            </div>
+            <paper-icon-button hidden id="edit-button" icon="icons:create"></paper-icon-button>
+            <paper-icon-button 
+              id="delete-button"
+              icon="icons:delete"
+              hidden$="[[!deleteAction.enabled]]"
+              on-tap="_onDeleteTapped">
+            </paper-icon-button>
+          </app-toolbar>
+        </app-header>
+        <app-drawer-layout>
+          <app-drawer slot="drawer">
+            <paper-listbox selected="1" on-tap="_onNavigationClicked">
+              <paper-item target="dashboard">Dashboard</paper-item>
+              <paper-item target="transactions">All transactions</paper-item>
+              <paper-item target="expenses">Monthly expenses</paper-item>
+              <paper-item target="income">Monthly income</paper-item>
+              <paper-item target="help">Help</paper-item>
+            </paper-listbox>
+          </app-drawer>
+          <main>
+            <iron-pages selected="{{selected}}" attr-for-selected="name" on-iron-select="_onPageSelected">
+
+              <div name="dashboard">
+                DASHBOARD PLACEHOLDER
+              </div>
+
+              <pf-transactions 
+                name="transactions"
+                database="[[context.firebase.database]]"
+                delete-action="{{deleteAction}}">
+              </pf-transactions>
+
+              <div name="expenses">
+                EXPENSES PLACEHOLDER
+              </div>
+
+              <div name="income">
+                INCOME PLACEHOLDER
+              </div>
+
+              <div name="help">
+                HELP PLACEHOLDER
+              </div>
+
+            </iron-pages>
+          </main>
+        </app-drawer-layout>
+      </app-header-layout>
+
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class PfApp extends Polymer.Element {
+      
+      static get is() { 
+        return 'pf-app';
+      }
+
+      static get properties() {
+        return {
+          deleteAction: {
+            type: Object,
+            observer: '_deleteActionChanged',
+            value: () => ({ 
+              enabled: false,
+              count: 0,
+              execute: null
+            })
+          },
+          title: {
+            type: String,
+            value: 'No Title'
+          },
+          context: {
+            type: Object,
+            value: () => window.PersonalFinance
+          },
+          selected: {
+            type: String,
+            value: "transactions"
+          }
+        }
+      }
+
+      _onNavigationClicked(e) {
+        this.set('selected', e.target.getAttribute('target'));
+      }
+
+      _onPageSelected(e) {
+        this.set('title', e.detail.item.title ? e.detail.item.title : 'No Title');
+      }
+
+      _deleteActionChanged(newValue, oldValue) {
+        console.log(newValue, oldValue);
+      }
+
+      _onDeleteTapped() {
+        this.get('deleteAction').execute();
+      }
+
+    }
+
+    window.customElements.define(PfApp.is, PfApp);
+  </script>
+</dom-module>

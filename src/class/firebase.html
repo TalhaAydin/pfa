@@ -1,0 +1,52 @@
+<script>
+    class FirebaseDatabase {
+        constructor(firebase) {
+            this.database = firebase.database();
+        }
+
+        bindNodeToProperty(nodeLocation, propertyToBind, elementContext) {
+            const ref = this.database.ref(nodeLocation);
+            ref.on('child_added', data => {
+                elementContext.push(propertyToBind, Object.assign(data.val(), { key: data.key }));
+            });
+            // @TODO Also handle remove, change, etc.
+        }
+
+        pushToNode(nodeLocation, varToPush) {
+            let ref = this.database.ref(nodeLocation).push();
+            ref.set(varToPush);
+        }
+
+        removeNode(nodeLocation) {
+            this.database.ref(nodeLocation).remove();
+        }
+
+    }
+
+    class Firebase {
+        constructor(firebaseObject) {
+            this.firebaseObject = firebaseObject;
+            this.initializeFirebase();
+            this.initializeDatabase();
+        }
+
+        get firebaseConfig() {
+            return {
+                apiKey: "AIzaSyBV66yNWXGdqNBqfPc2EZQ4M8dCqGAINjU",
+                authDomain: "personal-finance-app-fa8d3.firebaseapp.com",
+                databaseURL: "https://personal-finance-app-fa8d3.firebaseio.com",
+                projectId: "personal-finance-app-fa8d3",
+                storageBucket: "personal-finance-app-fa8d3.appspot.com",
+                messagingSenderId: "707314505670"
+            }
+        }
+
+        initializeFirebase() {
+            this.firebaseObject.initializeApp(this.firebaseConfig);
+        }
+
+        initializeDatabase() {
+            this.database = new FirebaseDatabase(this.firebaseObject);
+        }
+    }
+</script>

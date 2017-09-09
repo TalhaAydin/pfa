@@ -1,0 +1,37 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../mixin/ayd-form.html">
+
+<dom-module id="pf-transactions-form">
+  <template>
+    <paper-dialog>
+      <h2>Add transaction</h2>
+      <div>
+        <paper-input value="{{date}}" label="Date"></paper-input>
+        <paper-input value="{{description}}" label="Description"></paper-input>
+        <paper-input value="{{amount}}" label="Amount"></paper-input>
+      </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus on-tap="_onSaveTapped">Save</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script> 
+    class PfTransactionsForm extends Aydin.FormMixin(Polymer.Element) {
+      static get is() {
+        return 'pf-transactions-form';
+      }
+      static get properties() {
+        return {
+          "date": String,
+          "description": String,
+          "amount": Number
+        }
+      }
+    }
+    window.customElements.define(PfTransactionsForm.is, PfTransactionsForm);
+  </script>
+</dom-module>
