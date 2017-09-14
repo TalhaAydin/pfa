@@ -4,8 +4,12 @@
             this.database = firebase.database();
         }
 
+        __ref(nodeLocation) {
+            return this.database.ref(nodeLocation);
+        }
+
         bindNodeToProperty(nodeLocation, propertyToBind, elementContext) {
-            const ref = this.database.ref(nodeLocation);
+            const ref = this.__ref(nodeLocation);
             ref.on('child_added', data => {
                 elementContext.push(propertyToBind, Object.assign(data.val(), { key: data.key }));
             });
@@ -13,12 +17,11 @@
         }
 
         pushToNode(nodeLocation, varToPush) {
-            let ref = this.database.ref(nodeLocation).push();
-            ref.set(varToPush);
+            this.__ref(nodeLocation).push().set(varToPush);
         }
 
         removeNode(nodeLocation) {
-            this.database.ref(nodeLocation).remove();
+            this.__ref(nodeLocation).remove();
         }
 
     }
