@@ -17,11 +17,11 @@
         }
 
         pushToNode(nodeLocation, varToPush) {
-            this.__ref(nodeLocation).push().set(varToPush);
+            return this.__ref(nodeLocation).push().set(varToPush);
         }
 
         removeNode(nodeLocation) {
-            this.__ref(nodeLocation).remove();
+            return this.__ref(nodeLocation).remove();
         }
 
     }
