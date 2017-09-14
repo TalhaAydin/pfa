@@ -38,7 +38,7 @@
                 background-color: var(--paper-grey-200);
             }
 
-            tr.selected {
+            tr[selected] {
                 background-color: var(--paper-grey-100);
             }
 
@@ -54,7 +54,7 @@
             <thead>
                 <tr>
                     <th>
-                        <paper-checkbox on-change="_onMainCheckboxChanged"></paper-checkbox>
+                        <paper-checkbox checked="{{allSelected}}" on-change="_onMainCheckboxChanged"></paper-checkbox>
                     </th>
                     <template is="dom-repeat" items="[[_getFieldHeaders()]]" as="header">
                         <th>[[header]]</th>
@@ -63,13 +63,13 @@
             </thead>
 
             <tbody>
-                <template is="dom-repeat" items="[[rows]]" as="row">
-                    <tr data-key$=[[row.key]]>
+                <template is="dom-repeat" items="[[data]]" as="row">
+                    <tr data-key$=[[row.key]] selected$="[[row.selected]]">
                         <td>
-                            <paper-checkbox on-change="_onCheckboxChanged"></paper-checkbox>
+                            <paper-checkbox checked="{{row.selected}}" on-change="_onRowCheckboxChanged"></paper-checkbox>
                         </td>
                         <template is="dom-repeat" items="[[_getFieldKeys()]]" as="fieldKey">
-                            <td>[[_getData(row, fieldKey)]]</td>
+                            <td>[[_getData(row.data, fieldKey)]]</td>
                         </template>
                     </tr>
                 </template>
@@ -90,23 +90,39 @@
 
             static get properties() {
                 return {
-                    selectedKeys: {
+                    allSelected: {
+                        type: Boolean,
+                        notify: true,
+                        readOnly: true,
+                        computed: '_computeAllSelected(selectedCount, recordCount)'
+                    },
+                    selectedCount: {
+                        type: Number,
+                        value: -1,
+                        notify: true,
+                        readOnly: true,
+                        computed: '_computeSelectedCount(data.*)'
+                    },
+                    recordCount: {
+                        type: Number,
+                        value: 0,
+                        notify: true,
+                        readOnly: true,
+                        computed: '_computeRecordCount(data.*)'
+                    },
+                    data: {
                         type: Array,
                         value: () => [],
-                        readOnly: true,
                         notify: true
                     },
-                    "rows": {
-                        "type": Array
-                    },
-                    "fields": {
-                        "type": Array
+                    fields: {
+                        type: Array
                     }
                 }
             }
 
-            _getData(row, field) {
-                return row[field];
+            _getData(obj, field) {
+                return obj[field];
             }
 
             _getFieldKeys() {
@@ -117,31 +133,32 @@
                 return Object.values(this.fields);
             }
 
+            // @TODO Why doesn't the binding {{row.selected}} notify?
+            // Is it because it's scoped?
+            _onRowCheckboxChanged(e) {
+                this.notifyPath(`data.${e.model.index}.selected`);
+            }
+
             _onMainCheckboxChanged(e) {
-                const allCheckboxes = this.shadowRoot.querySelectorAll('tbody paper-checkbox');
-                const checked = e.target.checked;
-                allCheckboxes.forEach(checkbox => {
-                    checkbox.checked = checked;
-                    this.__checkboxEffects(checkbox);
-                });
+                this.get('data').forEach((row, index) => this.set(`data.${index}.selected`, e.target.checked));
             }
 
-            _onCheckboxChanged(e) {
-                this.__checkboxEffects(e.target);
+            _computeAllSelected(selectedCount, recordCount) {
+                return selectedCount === recordCount;
             }
 
-            __checkboxEffects(checkbox) {
-                const parentRow = checkbox.parentElement.parentElement;
-                const key = parentRow.dataset.key;
-                if(checkbox.checked) {
-                    parentRow.classList.add('selected');
-                    if(this.get('selectedKeys').indexOf(key) === -1) {
-                        this.push('selectedKeys', key);
-                    }
-                } else {
-                    parentRow.classList.remove('selected');
-                    this.splice('selectedKeys', this.get('selectedKeys').indexOf(key), 1);
+            _computeSelectedCount(changeRecord) {
+                if(changeRecord.path.endsWith('.selected')) {
+                    return changeRecord.base.filter(record => record.selected).length;
                 }
+                return this.get('selectedCount');
+            }
+
+            _computeRecordCount(changeRecord) {
+                if(changeRecord.path === 'data.length') {
+                    return changeRecord.value;
+                }
+                return this.get('recordCount');
             }
 
         }

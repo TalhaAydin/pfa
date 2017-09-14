@@ -11,7 +11,7 @@
         bindNodeToProperty(nodeLocation, propertyToBind, elementContext) {
             const ref = this.__ref(nodeLocation);
             ref.on('child_added', data => {
-                elementContext.push(propertyToBind, Object.assign(data.val(), { key: data.key }));
+                elementContext.push(propertyToBind, { key: data.key, data: data.val() });
             });
 
             ref.on('child_removed', data => {

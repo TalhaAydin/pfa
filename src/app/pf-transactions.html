@@ -17,9 +17,8 @@
     
     <ayd-datatable
       id="datatable"
-      rows="[[transactions]]" 
-      fields="[[transactionsFields]]"
-      selected-keys="{{selectedKeys}}">
+      data="{{transactions}}"
+      fields="[[transactionsFields]]">
     </ayd-datatable>
 
     <pf-transactions-form
@@ -53,9 +52,6 @@
           title: {
             type: String,
             value: "All Transactions",
-          },
-          selectedKeys: {
-            type: Array
           },
           deleteAction: {
             type: Object,
