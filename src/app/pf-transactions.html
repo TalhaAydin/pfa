@@ -57,7 +57,7 @@
             type: Object,
             readOnly: true,
             notify: true,
-            computed: '_computeDeleteAction(selectedKeys.splices)'
+            computed: '_computeDeleteAction(transactions.*)'
           },
           database: {
             type: Object
@@ -95,12 +95,13 @@
 
       _computeDeleteAction(changeRecord) {
         if(changeRecord) {
-          const count = changeRecord.indexSplices[0].object.length;
+          const selectedTransactions = changeRecord.base.filter(e => e.selected);
+          const count = selectedTransactions.length;
           const enabled = count > 0;
           const execute = () => {
-            changeRecord.indexSplices[0].object.forEach((key) => this.database.removeNode(`transactions/${key}`));
+            selectedTransactions.forEach(transaction => this.database.removeNode(`transactions/${transaction.key}`));
           }
-          return { enabled, count, execute };  
+          return { enabled, count, execute };
         }
       }
 
