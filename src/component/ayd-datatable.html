@@ -54,7 +54,7 @@
             <thead>
                 <tr>
                     <th>
-                        <paper-checkbox checked="{{allSelected}}" on-change="_onMainCheckboxChanged"></paper-checkbox>
+                        <paper-checkbox checked="{{isAllSelected}}" on-change="_onMainCheckboxChanged"></paper-checkbox>
                     </th>
                     <template is="dom-repeat" items="[[_getFieldHeaders()]]" as="header">
                         <th>[[header]]</th>
@@ -90,26 +90,6 @@
 
             static get properties() {
                 return {
-                    allSelected: {
-                        type: Boolean,
-                        notify: true,
-                        readOnly: true,
-                        computed: '_computeAllSelected(selectedCount, recordCount)'
-                    },
-                    selectedCount: {
-                        type: Number,
-                        value: -1,
-                        notify: true,
-                        readOnly: true,
-                        computed: '_computeSelectedCount(data.*)'
-                    },
-                    recordCount: {
-                        type: Number,
-                        value: 0,
-                        notify: true,
-                        readOnly: true,
-                        computed: '_computeRecordCount(data.*)'
-                    },
                     data: {
                         type: Array,
                         value: () => [],
@@ -117,6 +97,40 @@
                     },
                     fields: {
                         type: Array
+                    },
+                    rowCount: {
+                        type: Number,
+                        value: 0,
+                        notify: true,
+                        readOnly: true,
+                        computed: '_computeRowCount(data.*)'
+                    },
+                    selectedData: {
+                        type: Array,
+                        value: () => [],
+                        notify: true,
+                        readOnly: true,
+                        computed: '_computeSelectedData(data.*)'
+                    },
+                    selectedCount: {
+                        type: Number,
+                        value: -1,
+                        notify: true,
+                        readOnly: true,
+                        computed: '_computeSelectedCount(selectedData)'
+                    },
+                    isAllSelected: {
+                        type: Boolean,
+                        notify: true,
+                        readOnly: true,
+                        computed: '_computeIsAllSelected(selectedCount, rowCount)'
+                    },
+                    selectedKeys: {
+                        type: Array,
+                        value: () => [],
+                        notify: true,
+                        readOnly: true,
+                        computed: '_computeSelectedKeys(selectedData)'
                     }
                 }
             }
@@ -133,9 +147,8 @@
                 return Object.values(this.fields);
             }
 
-            // @TODO Why doesn't the binding {{row.selected}} notify?
-            // Is it because it's scoped?
             _onRowCheckboxChanged(e) {
+                // @TODO Why doesn't the binding {{row.selected}} notify? Is it because it's scoped?
                 this.notifyPath(`data.${e.model.index}.selected`);
             }
 
@@ -143,22 +156,24 @@
                 this.get('data').forEach((row, index) => this.set(`data.${index}.selected`, e.target.checked));
             }
 
-            _computeAllSelected(selectedCount, recordCount) {
-                return selectedCount === recordCount;
+            _computeSelectedData(changeRecord) {
+                return changeRecord.path.endsWith('.selected') ? changeRecord.base.filter(e => e.selected) : this.get('selectedRows');
             }
 
-            _computeSelectedCount(changeRecord) {
-                if(changeRecord.path.endsWith('.selected')) {
-                    return changeRecord.base.filter(record => record.selected).length;
-                }
-                return this.get('selectedCount');
+            _computeRowCount(changeRecord) {
+                return changeRecord.path === 'data.length' ? changeRecord.value : this.get('rowCount');
             }
 
-            _computeRecordCount(changeRecord) {
-                if(changeRecord.path === 'data.length') {
-                    return changeRecord.value;
-                }
-                return this.get('recordCount');
+            _computeSelectedCount(selectedData = []) {
+                return selectedData.length;
+            }
+
+            _computeSelectedKeys(selectedData = []) {
+                return selectedData.map(e => e.key);
+            }
+
+            _computeIsAllSelected(selectedCount, rowCount) {
+                return selectedCount === rowCount;
             }
 
         }
