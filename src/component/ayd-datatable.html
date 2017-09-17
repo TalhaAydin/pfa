@@ -2,181 +2,186 @@
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 
 <dom-module id="ayd-datatable">
-    <template>
-        <style>
-            table {
-                width: 100%;
-                @apply --paper-font-common-base;
-                font-size: 13px;
-                opacity: var(--dark-primary-opacity);
-                text-align: left;
-                border-collapse: collapse;
-            }
+  <template>
+    <style>
+      table {
+        width: 100%;
+        @apply --paper-font-common-base;
+        font-size: 13px;
+        opacity: var(--dark-primary-opacity);
+        text-align: left;
+        border-collapse: collapse;
+      }
 
-            th + th {
-                font-size: 12px;
-                font-weight: 500;
-                opacity: var(--dark-secondary-opacity);
-                height: 56px;
-            }
+      th+th {
+        font-size: 12px;
+        font-weight: 500;
+        opacity: var(--dark-secondary-opacity);
+        height: 56px;
+      }
 
-            td:first-of-type, th:first-of-type {
-                padding: 0 24px;
-                width: 1px;
-            }
+      td:first-of-type,
+      th:first-of-type {
+        padding: 0 24px;
+        width: 1px;
+      }
 
-            td:last-of-type, th:last-of-type {
-                padding-right: 24px;
-            }
+      td:last-of-type,
+      th:last-of-type {
+        padding-right: 24px;
+      }
 
-            td {
-                height: 48px;
-                border-top: solid 1px var(--divider-color);
-            }
+      td {
+        height: 48px;
+        border-top: solid 1px var(--divider-color);
+      }
 
-            tbody tr:hover {
-                background-color: var(--paper-grey-200);
-            }
+      tbody tr:hover {
+        background-color: var(--paper-grey-200);
+      }
 
-            tr[selected] {
-                background-color: var(--paper-grey-100);
-            }
+      tr[selected] {
+        background-color: var(--paper-grey-100);
+      }
 
-            paper-checkbox {
-                width: 18px;
-                --paper-checkbox-checked-color: var(--accent-color);
-            }
+      paper-checkbox {
+        width: 18px;
+        --paper-checkbox-checked-color: var(--accent-color);
+      }
+    </style>
 
-        </style>
+    <table hidden$="[[_computeHideTable(rowCount)]]">
 
-        <table>
+      <thead>
+        <tr>
+          <th>
+            <paper-checkbox checked="{{isAllSelected}}" on-change="_onMainCheckboxChanged"></paper-checkbox>
+          </th>
+          <template is="dom-repeat" items="[[_getFieldHeaders()]]" as="header">
+            <th>[[header]]</th>
+          </template>
+        </tr>
+      </thead>
 
-            <thead>
-                <tr>
-                    <th>
-                        <paper-checkbox checked="{{isAllSelected}}" on-change="_onMainCheckboxChanged"></paper-checkbox>
-                    </th>
-                    <template is="dom-repeat" items="[[_getFieldHeaders()]]" as="header">
-                        <th>[[header]]</th>
-                    </template>
-                </tr>
-            </thead>
+      <tbody>
+        <template is="dom-repeat" items="[[data]]" as="row">
+          <tr data-key$=[[row.key]] selected$="[[row.selected]]">
+            <td>
+              <paper-checkbox checked="{{row.selected}}" on-change="_onRowCheckboxChanged"></paper-checkbox>
+            </td>
+            <template is="dom-repeat" items="[[_getFieldKeys()]]" as="fieldKey">
+              <td>[[_getData(row.data, fieldKey)]]</td>
+            </template>
+          </tr>
+        </template>
+      </tbody>
 
-            <tbody>
-                <template is="dom-repeat" items="[[data]]" as="row">
-                    <tr data-key$=[[row.key]] selected$="[[row.selected]]">
-                        <td>
-                            <paper-checkbox checked="{{row.selected}}" on-change="_onRowCheckboxChanged"></paper-checkbox>
-                        </td>
-                        <template is="dom-repeat" items="[[_getFieldKeys()]]" as="fieldKey">
-                            <td>[[_getData(row.data, fieldKey)]]</td>
-                        </template>
-                    </tr>
-                </template>
-            </tbody>
+    </table>
 
-        </table>
-
-    </template>
-    <script>
-        /**
+  </template>
+  <script>
+    /**
          * @customElement
          * @polymer
          */
-        class AydDatatable extends Polymer.Element {
-            static get is() {
-                return 'ayd-datatable';
-            }
+    class AydDatatable extends Polymer.Element {
+      static get is() {
+        return 'ayd-datatable';
+      }
 
-            static get properties() {
-                return {
-                    data: {
-                        type: Array,
-                        value: () => [],
-                        notify: true
-                    },
-                    fields: {
-                        type: Array
-                    },
-                    rowCount: {
-                        type: Number,
-                        value: 0,
-                        notify: true,
-                        readOnly: true,
-                        computed: '_computeRowCount(data.*)'
-                    },
-                    selectedData: {
-                        type: Array,
-                        value: () => [],
-                        notify: true,
-                        readOnly: true,
-                        computed: '_computeSelectedData(data.*)'
-                    },
-                    selectedCount: {
-                        type: Number,
-                        value: -1,
-                        notify: true,
-                        readOnly: true,
-                        computed: '_computeSelectedCount(selectedData)'
-                    },
-                    isAllSelected: {
-                        type: Boolean,
-                        notify: true,
-                        readOnly: true,
-                        computed: '_computeIsAllSelected(selectedCount, rowCount)'
-                    },
-                    selectedKeys: {
-                        type: Array,
-                        value: () => [],
-                        notify: true,
-                        readOnly: true,
-                        computed: '_computeSelectedKeys(selectedData)'
-                    }
-                }
-            }
-
-            _getData(obj, field) {
-                return obj[field];
-            }
-
-            _getFieldKeys() {
-                return Object.keys(this.fields);
-            }
-
-            _getFieldHeaders() {
-                return Object.values(this.fields);
-            }
-
-            _onRowCheckboxChanged(e) {
-                // @TODO Why doesn't the binding {{row.selected}} notify? Is it because it's scoped?
-                this.notifyPath(`data.${e.model.index}.selected`);
-            }
-
-            _onMainCheckboxChanged(e) {
-                this.get('data').forEach((row, index) => this.set(`data.${index}.selected`, e.target.checked));
-            }
-
-            _computeSelectedData(changeRecord) {
-                return changeRecord.path.endsWith('.selected') ? changeRecord.base.filter(e => e.selected) : this.get('selectedRows');
-            }
-
-            _computeRowCount(changeRecord) {
-                return changeRecord.path === 'data.length' ? changeRecord.value : this.get('rowCount');
-            }
-
-            _computeSelectedCount(selectedData = []) {
-                return selectedData.length;
-            }
-
-            _computeSelectedKeys(selectedData = []) {
-                return selectedData.map(e => e.key);
-            }
-
-            _computeIsAllSelected(selectedCount, rowCount) {
-                return selectedCount === rowCount;
-            }
-
+      static get properties() {
+        return {
+          data: {
+            type: Array,
+            value: () => [],
+            notify: true
+          },
+          fields: {
+            type: Array
+          },
+          rowCount: {
+            type: Number,
+            value: 0,
+            notify: true,
+            readOnly: true,
+            computed: '_computeRowCount(data.*)'
+          },
+          selectedData: {
+            type: Array,
+            value: () => [],
+            notify: true,
+            readOnly: true,
+            computed: '_computeSelectedData(data.*)'
+          },
+          selectedCount: {
+            type: Number,
+            value: -1,
+            notify: true,
+            readOnly: true,
+            computed: '_computeSelectedCount(selectedData)'
+          },
+          isAllSelected: {
+            type: Boolean,
+            notify: true,
+            readOnly: true,
+            computed: '_computeIsAllSelected(selectedCount, rowCount)'
+          },
+          selectedKeys: {
+            type: Array,
+            value: () => [],
+            notify: true,
+            readOnly: true,
+            computed: '_computeSelectedKeys(selectedData)'
+          }
         }
-        customElements.define(AydDatatable.is, AydDatatable);
-    </script>
+      }
+
+      _getData(obj, field) {
+        return obj[field];
+      }
+
+      _getFieldKeys() {
+        return Object.keys(this.fields);
+      }
+
+      _getFieldHeaders() {
+        return Object.values(this.fields);
+      }
+
+      _onRowCheckboxChanged(e) {
+        // @TODO Why doesn't the binding {{row.selected}} notify? Is it because it's scoped?
+        this.notifyPath(`data.${e.model.index}.selected`);
+      }
+
+      _onMainCheckboxChanged(e) {
+        this.get('data').forEach((row, index) => this.set(`data.${index}.selected`, e.target.checked));
+      }
+
+      _computeSelectedData(changeRecord) {
+        return changeRecord.path.endsWith('.selected') ? changeRecord.base.filter(e => e.selected) : this.get('selectedRows');
+      }
+
+      _computeRowCount(changeRecord) {
+        return changeRecord.path === 'data.length' ? changeRecord.value : this.get('rowCount');
+      }
+
+      _computeSelectedCount(selectedData = []) {
+        return selectedData.length;
+      }
+
+      _computeSelectedKeys(selectedData = []) {
+        return selectedData.map(e => e.key);
+      }
+
+      _computeIsAllSelected(selectedCount, rowCount) {
+        return selectedCount === rowCount;
+      }
+
+      _computeHideTable(rowCount) {
+        return rowCount === 0;
+      }
+
+    }
+    customElements.define(AydDatatable.is, AydDatatable);
+  </script>
 </dom-module>

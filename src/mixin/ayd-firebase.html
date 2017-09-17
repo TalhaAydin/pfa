@@ -1,0 +1,41 @@
+<link rel="import" href="../../bower_components/polymer/lib/utils/mixin.html">
+
+<script>
+  if (!window.Aydin) {
+    window.Aydin = {};
+  }
+
+  Aydin.FirebaseMixin = (function (firebase) {
+    return Polymer.dedupingMixin(base => class extends base {
+
+      __ref(nodeLocation) {
+        return firebase.database().ref(nodeLocation);
+      }
+
+      bindNode(nodeLocation, propertyToBind) {
+
+        const ref = this.__ref(nodeLocation);
+
+        ref.on('child_added', data => {
+          this.push(propertyToBind, { key: data.key, data: data.val() });
+        });
+
+        ref.on('child_removed', data => {
+          this.splice(propertyToBind, this.get(propertyToBind).findIndex(e => data.key === e.key), 1);
+        });
+
+        // @TODO Also handle changes
+      }
+
+      pushNode(nodeLocation, varToPush) {
+        return this.__ref(nodeLocation).push().set(varToPush);
+      }
+
+      removeNode(nodeLocation) {
+        return this.__ref(nodeLocation).remove();
+      }
+
+    });
+  })(window.firebase);
+
+</script>

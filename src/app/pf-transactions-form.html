@@ -2,16 +2,16 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../mixin/ayd-form.html">
+<link rel="import" href="../mixin/ayd-firebase.html">
 
 <dom-module id="pf-transactions-form">
   <template>
-    <paper-dialog>
+    <paper-dialog opened="{{opened}}">
       <h2>Add transaction</h2>
       <div>
-        <paper-input value="{{date}}" label="Date"></paper-input>
-        <paper-input value="{{description}}" label="Description"></paper-input>
-        <paper-input value="{{amount}}" label="Amount"></paper-input>
+        <paper-input value="{{transaction.date}}" label="Date"></paper-input>
+        <paper-input value="{{transaction.description}}" label="Description"></paper-input>
+        <paper-input value="{{transaction.amount}}" label="Amount"></paper-input>
       </div>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
@@ -20,17 +20,35 @@
     </paper-dialog>
   </template>
   <script> 
-    class PfTransactionsForm extends Aydin.FormMixin(Polymer.Element) {
+    class PfTransactionsForm extends Aydin.FirebaseMixin(Polymer.Element) {
+      
       static get is() {
         return 'pf-transactions-form';
       }
+
       static get properties() {
         return {
-          "date": String,
-          "description": String,
-          "amount": Number
+          transaction: {
+            type: Object,
+            value: () => ({
+              date: '',
+              description: '',
+              amount: ''
+            })
+          },
+          opened: {
+            type: Boolean,
+            value: false,
+            notify: true
+          }
         }
       }
+
+      _onSaveTapped() {
+        this.pushNode('transactions', this.get('transaction'));
+        this.opened = false;
+      }
+
     }
     window.customElements.define(PfTransactionsForm.is, PfTransactionsForm);
   </script>
