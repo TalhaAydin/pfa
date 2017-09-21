@@ -63,7 +63,7 @@
             <div main-title>
               [[_computeTitle(selectedPage)]] [[_computeSelectedTitle(selectedData)]]
             </div>
-            <paper-icon-button hidden id="edit-button" icon="icons:create"></paper-icon-button>
+            <paper-icon-button hidden$="[[!_computeHasOneSelected(selectedData)]]" id="edit-button" icon="icons:create" on-tap="_onEditTapped"></paper-icon-button>
             <paper-icon-button hidden$="[[!_computeHasSelected(selectedData)]]" id="delete-button" icon="icons:delete" on-tap="_onDeleteTapped"></paper-icon-button>
           </app-toolbar>
         </app-header>
@@ -131,8 +131,16 @@
         return selectedData.length > 0;
       }
 
+      _computeHasOneSelected(selectedData = []) {
+        return selectedData.length === 1;
+      }
+
       _onDeleteTapped() {
         this.get('selectedData').forEach(v => this.removeNode(`transactions/${v.key}`));
+      }
+
+      _onEditTapped() {
+        alert('Edit tapped but not implemented');
       }
 
     }
