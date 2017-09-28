@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../component/ayd-datatable.html">
 <link rel="import" href="../mixin/ayd-firebase.html">
+<link rel="import" href="../mixin/ayd-redux.html">
 <link rel="import" href="pf-transactions-form.html">
 
 <dom-module id="pf-transactions">
@@ -18,15 +19,14 @@
     
     <ayd-datatable
       id="datatable"
-      data="{{data}}"
-      selected-data="{{selectedData}}"
+      data="[[data]]"
+      selected="{{selected}}"
       fields="[[fields]]">
     </ayd-datatable>
 
     <pf-transactions-form
       id="form"
-      opened="{{formOpened}}"
-      on-push="_onPush">
+      opened="{{formOpened}}">
     </pf-transactions-form>
 
     <paper-fab icon="icons:add" on-tap="_onFabTapped"></paper-fab>
@@ -38,14 +38,15 @@
      * @customElement
      * @polymer
      */
-    class PfTransactions extends Aydin.FirebaseMixin(Polymer.Element) {
+    class PfTransactions extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
 
       ready() {
         super.ready();
-        this.bindNode('transactions', 'data');
+        this.onChildNodeAdded('transactions', data => this.dispatch({ type: TRANSACTION.ADD, payload: { key: data.key, data: data.val() } }));
+        this.onChildNodeRemoved('transactions', data => this.dispatch({ type: TRANSACTION.REMOVE, payload: data.key }));
       }
       
-      static get is() { 
+      static get is() {
         return 'pf-transactions';
       }
       
@@ -53,11 +54,11 @@
         return {
           title: {
             type: String,
-            value: "All Transactions",
+            value: "All transactions",
           },
-          selectedData: {
+          selected: {
             type: Array,
-            notify: true
+            observer: '_onSelectedChanged'
           },
           formOpened: {
             type: Boolean,
@@ -67,7 +68,7 @@
           data: {
             type: Array,
             value: () => [],
-            notify: true
+            computed: 'computeFromState(state.transactions.data)'
           },
           fields: {
             type: Array,
@@ -83,6 +84,12 @@
 
       _onFabTapped() {
         this.set('formOpened', true);
+      }
+
+      _onSelectedChanged(newValue = [], oldValue = []) {
+        if(newValue.length !== oldValue.length) {
+          this.dispatch({type: TRANSACTION.SELECT, payload: newValue});
+        }
       }
 
     }

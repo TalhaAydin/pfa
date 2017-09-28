@@ -7,6 +7,7 @@
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../mixin/ayd-firebase.html">
+<link rel="import" href="../mixin/ayd-redux.html">
 <link rel="import" href="./pf-transactions.html">
 
 <dom-module id="pf-app">
@@ -34,6 +35,10 @@
         --paper-icon-button-ink-color: var(--dark-theme-text-color);
       }
 
+      app-header app-toolbar paper-icon-button:not([visible]) {
+        display: none;
+      }
+
       app-header-layout main {
         padding: 16px;
       }
@@ -58,13 +63,13 @@
     </style>
     
       <app-header-layout fullbleed>
-        <app-header fixed slot="header" has-selected-data$="[[_computeHasSelected(selectedData)]]">
+        <app-header fixed slot="header" has-selected-data$="[[_computeHasSelected(state.transactions.selected)]]">
           <app-toolbar>
             <div main-title>
-              [[_computeTitle(selectedPage)]] [[_computeSelectedTitle(selectedData)]]
+              [[_computeTitle(selectedPage)]] [[_computeSelectedTitle(state.transactions.selected)]]
             </div>
-            <paper-icon-button hidden$="[[!_computeHasOneSelected(selectedData)]]" id="edit-button" icon="icons:create" on-tap="_onEditTapped"></paper-icon-button>
-            <paper-icon-button hidden$="[[!_computeHasSelected(selectedData)]]" id="delete-button" icon="icons:delete" on-tap="_onDeleteTapped"></paper-icon-button>
+            <paper-icon-button visible$="[[_computeHasOneSelected(state.transactions.selected)]]" id="edit-button" icon="icons:create" on-tap="_onEditTapped"></paper-icon-button>
+            <paper-icon-button visible$="[[_computeHasSelected(state.transactions.selected)]]" id="delete-button" icon="icons:delete" on-tap="_onDeleteTapped"></paper-icon-button>
           </app-toolbar>
         </app-header>
         <app-drawer-layout>
@@ -80,7 +85,7 @@
           <main>
             <iron-pages id="pages" selected="{{selectedPage}}" attr-for-selected="name">
               <div name="dashboard" title="Dashboard">DASHBOARD PLACEHOLDER</div>
-              <pf-transactions name="transactions" selected-data="{{selectedData}}"></pf-transactions>
+              <pf-transactions name="transactions"></pf-transactions>
               <div name="expenses" title="Monthly expenses">EXPENSES PLACEHOLDER</div>
               <div name="income" title="Monthly income">INCOME PLACEHOLDER</div>
               <div name="help" title="Help">HELP PLACEHOLDER</div>
@@ -96,7 +101,7 @@
      * @customElement
      * @polymer
      */
-    class PfApp extends Aydin.FirebaseMixin(Polymer.Element) {
+    class PfApp extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
       
       static get is() { 
         return 'pf-app';
@@ -107,10 +112,6 @@
           selectedPage: {
             type: String,
             value: "transactions"
-          },
-          selectedData: {
-            type: Array,
-            value:() => []
           }
         }
       }
@@ -123,24 +124,24 @@
         return this.$.pages.querySelector(`[name=${selectedPage}]`).title;
       }
 
-      _computeSelectedTitle(selectedData = []) {
-        return selectedData.length > 0 ? `(${selectedData.length} selected)` : '';
+      _computeSelectedTitle(selected = []) {
+        return selected.length > 0 ? `(${selected.length} selected)` : '';
       }
 
-      _computeHasSelected(selectedData = []) {
-        return selectedData.length > 0;
+      _computeHasSelected(selected = []) {
+        return selected.length > 0;
       }
 
-      _computeHasOneSelected(selectedData = []) {
-        return selectedData.length === 1;
+      _computeHasOneSelected(selected = []) {
+        return selected.length === 1;
       }
 
       _onDeleteTapped() {
-        this.get('selectedData').forEach(v => this.removeNode(`transactions/${v.key}`));
+        this.get('state.transactions.selected').forEach(key => this.removeNode(`transactions/${key}`));
       }
 
       _onEditTapped() {
-        alert('Edit tapped but not implemented');
+        console.log('Not implemented yet!');
       }
 
     }

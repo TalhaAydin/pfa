@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 
+<!-- Only manages selected keys. Data is parents responsibility. -->
 <dom-module id="ayd-datatable">
   <template>
     <style>
@@ -50,12 +51,12 @@
       }
     </style>
 
-    <table hidden$="[[_computeHideTable(rowCount)]]">
+    <table>
 
       <thead>
         <tr>
           <th>
-            <paper-checkbox checked="{{isAllSelected}}" on-change="_onMainCheckboxChanged"></paper-checkbox>
+            <paper-checkbox checked="[[_computeIsAllSelected(data, selected)]]" on-change="_onMainCheckboxChanged"></paper-checkbox>
           </th>
           <template is="dom-repeat" items="[[_getFieldHeaders()]]" as="header">
             <th>[[header]]</th>
@@ -65,9 +66,9 @@
 
       <tbody>
         <template is="dom-repeat" items="[[data]]" as="row">
-          <tr data-key$=[[row.key]] selected$="[[row.selected]]">
+          <tr data-key$=[[row.key]] selected$="[[_isRowChecked(row.key, selected)]]">
             <td>
-              <paper-checkbox checked="{{row.selected}}" on-change="_onRowCheckboxChanged"></paper-checkbox>
+              <paper-checkbox checked="[[_isRowChecked(row.key, selected)]]" on-change="_onRowCheckboxChanged"></paper-checkbox>
             </td>
             <template is="dom-repeat" items="[[_getFieldKeys()]]" as="fieldKey">
               <td>[[_getData(row.data, fieldKey)]]</td>
@@ -81,9 +82,9 @@
   </template>
   <script>
     /**
-         * @customElement
-         * @polymer
-         */
+     * @customElement
+     * @polymer
+     */
     class AydDatatable extends Polymer.Element {
       static get is() {
         return 'ayd-datatable';
@@ -94,44 +95,15 @@
           data: {
             type: Array,
             value: () => [],
+            observer: '_onDataChanged'
+          },
+          selected: {
+            type: Array,
+            value: () => [],
             notify: true
           },
           fields: {
             type: Array
-          },
-          rowCount: {
-            type: Number,
-            value: 0,
-            notify: true,
-            readOnly: true,
-            computed: '_computeRowCount(data.*)'
-          },
-          selectedData: {
-            type: Array,
-            value: () => [],
-            notify: true,
-            readOnly: true,
-            computed: '_computeSelectedData(data.*)'
-          },
-          selectedCount: {
-            type: Number,
-            value: -1,
-            notify: true,
-            readOnly: true,
-            computed: '_computeSelectedCount(selectedData)'
-          },
-          isAllSelected: {
-            type: Boolean,
-            notify: true,
-            readOnly: true,
-            computed: '_computeIsAllSelected(selectedCount, rowCount)'
-          },
-          selectedKeys: {
-            type: Array,
-            value: () => [],
-            notify: true,
-            readOnly: true,
-            computed: '_computeSelectedKeys(selectedData)'
           }
         }
       }
@@ -149,36 +121,34 @@
       }
 
       _onRowCheckboxChanged(e) {
-        // @TODO Why doesn't the binding {{row.selected}} notify? Is it because it's scoped?
-        this.notifyPath(`data.${e.model.index}.selected`);
+        const key = e.model.row.key;
+        if(this.selected.includes(key)) {
+          this.selected = [...this.selected.filter(e => e !== key)];
+        } else {
+          this.selected = [...this.selected, key];
+        }
       }
 
       _onMainCheckboxChanged(e) {
-        this.get('data').forEach((row, index) => this.set(`data.${index}.selected`, e.target.checked));
+        if(e.target.checked) {
+          this.selected = this.data.map(e => e.key);
+        } else {
+          this.selected = [];
+        }
       }
 
-      _computeSelectedData(changeRecord) {
-        return changeRecord.path.endsWith('.selected') ? changeRecord.base.filter(e => e.selected) : this.get('selectedRows');
+      _computeIsAllSelected(data, selected) {
+        return data.length + selected.length > 0 ? data.length === selected.length : false;
       }
 
-      _computeRowCount(changeRecord) {
-        return changeRecord.path === 'data.length' ? changeRecord.value : this.get('rowCount');
+      _isRowChecked(key, selected) {
+        return selected.includes(key);
       }
 
-      _computeSelectedCount(selectedData = []) {
-        return selectedData.length;
-      }
-
-      _computeSelectedKeys(selectedData = []) {
-        return selectedData.map(e => e.key);
-      }
-
-      _computeIsAllSelected(selectedCount, rowCount) {
-        return selectedCount === rowCount;
-      }
-
-      _computeHideTable(rowCount) {
-        return rowCount === 0;
+      _onDataChanged(newValue = [], oldValue = []) {
+        if(newValue.length !== oldValue.length && this.selected.length > 0) {
+          this.selected = this.selected.filter(key => this.data.map(e => e.key).includes(key));
+        }
       }
 
     }

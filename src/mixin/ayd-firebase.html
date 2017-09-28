@@ -8,13 +8,17 @@
   Aydin.FirebaseMixin = (function (firebase) {
     return Polymer.dedupingMixin(base => class extends base {
 
-      __ref(nodeLocation) {
-        return firebase.database().ref(nodeLocation);
+      get database() {
+        return firebase.database();
+      }
+
+      nodeRef(nodeLocation) {
+        return this.database.ref(nodeLocation);
       }
 
       bindNode(nodeLocation, propertyToBind) {
 
-        const ref = this.__ref(nodeLocation);
+        const ref = this.nodeRef(nodeLocation);
 
         ref.on('child_added', data => {
           this.push(propertyToBind, { key: data.key, data: data.val() });
@@ -27,12 +31,20 @@
         // @TODO Also handle changes
       }
 
+      onChildNodeAdded(nodeLocation, callback) {
+        this.nodeRef(nodeLocation).on('child_added', callback);
+      }
+
+      onChildNodeRemoved(nodeLocation, callback) {
+        this.nodeRef(nodeLocation).on('child_removed', callback);
+      }
+
       pushNode(nodeLocation, varToPush) {
-        return this.__ref(nodeLocation).push().set(varToPush);
+        return this.nodeRef(nodeLocation).push().set(varToPush);
       }
 
       removeNode(nodeLocation) {
-        return this.__ref(nodeLocation).remove();
+        return this.nodeRef(nodeLocation).remove();
       }
 
     });

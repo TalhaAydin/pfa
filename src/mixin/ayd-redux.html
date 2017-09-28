@@ -1,0 +1,35 @@
+<link rel="import" href="../../bower_components/polymer/lib/utils/mixin.html">
+
+<script>
+  if (!window.Aydin) {
+    window.Aydin = {};
+  }
+
+  Aydin.ReduxMixin = (function (reduxStore) {
+    return Polymer.dedupingMixin(base => class extends base {
+
+      static get properties() {
+        return {
+          "state": {
+            type: Object
+          }
+        }
+      }
+
+      ready() {
+        super.ready();
+        reduxStore.subscribe(() => this.set('state', reduxStore.getState()));
+      }
+
+      dispatch(action) {
+        reduxStore.dispatch(action);
+      }
+
+      computeFromState(path) {
+        return path;
+      }
+
+    });
+  })(window.reduxStore);
+
+</script>
