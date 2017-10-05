@@ -1,7 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 
-<!-- Only manages selected keys. Data is parents responsibility. -->
 <dom-module id="ayd-datatable">
   <template>
     <style>
@@ -147,7 +146,8 @@
 
       _onDataChanged(newValue = [], oldValue = []) {
         if(newValue.length !== oldValue.length && this.selected.length > 0) {
-          this.selected = this.selected.filter(key => this.data.map(e => e.key).includes(key));
+          const allKeys = newValue.map(e => e.key);
+          this.selected = this.selected.filter(key => allKeys.includes(key));
         }
       }
 

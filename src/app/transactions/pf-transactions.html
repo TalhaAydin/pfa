@@ -1,0 +1,36 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="pf-transactions-datatable.html">
+<link rel="import" href="pf-transactions-form.html">
+
+<dom-module id="pf-transactions">
+  <template>
+    <pf-transactions-datatable id="datatable"></pf-transactions-datatable>
+    <pf-transactions-form id="form" opened="{{formOpened}}"></pf-transactions-form>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class PfTransactions extends Polymer.Element {
+      
+      static get is() {
+        return 'pf-transactions';
+      }
+      
+      static get properties() {
+        return {
+          formOpened: {
+            type: Boolean,
+            value: false,
+            notify: true
+          }
+        }
+      }
+
+    }
+
+    window.customElements.define(PfTransactions.is, PfTransactions);
+  </script>
+</dom-module>

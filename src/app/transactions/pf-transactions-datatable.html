@@ -1,0 +1,54 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../component/ayd-datatable.html">
+<link rel="import" href="../../mixin/ayd-firebase.html">
+<link rel="import" href="../../mixin/ayd-redux.html">
+
+<dom-module id="pf-transactions-datatable">
+  <script> 
+    class PfTransactionsDatatable extends Aydin.ReduxMixin(Aydin.FirebaseMixin(AydDatatable)) {
+
+      static get is() {
+        return 'pf-transactions-datatable';
+      }
+
+      ready() {
+        super.ready();
+        this.onChildNodeAdded('transactions', data => this.dispatch({ type: TRANSACTION.ADD, payload: { key: data.key, data: data.val() } }));
+        this.onChildNodeRemoved('transactions', data => this.dispatch({ type: TRANSACTION.REMOVE, payload: data.key }));
+      }
+
+      static get properties() {
+        return {
+          fields: {
+            type: Array,
+            readOnly: true,
+            value: () => ({
+              'date': 'Date',
+              'description': 'Description',
+              'amount': 'Amount'
+            })
+          },
+          data: {
+            type: Array,
+            value: () => [],
+            computed: 'computeFromState(state.transactions.data)',
+            observer: '_onDataChanged'
+          },
+          selected: {
+            type: Array,
+            value: () => [],
+            observer: '_onSelectedChanged'
+          }
+        }
+      }
+
+      _onSelectedChanged(newValue = [], oldValue = []) {
+        if(newValue.length !== oldValue.length) {
+          this.dispatch({type: TRANSACTION.SELECT, payload: newValue});
+        }
+      }
+
+    }
+    window.customElements.define(PfTransactionsDatatable.is, PfTransactionsDatatable);
+  </script>
+</dom-module>
