@@ -3,11 +3,12 @@
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../mixin/ayd-firebase.html">
+<link rel="import" href="../../mixin/ayd-redux.html">
 
 <dom-module id="pf-transactions-form">
   <template>
-    <paper-dialog opened="{{opened}}">
-      <h2>Add transaction</h2>
+    <paper-dialog opened="[[opened]]" on-iron-overlay-closed="_resetForm">
+      <h2>[[_computeTitle(editKey)]]</h2>
       <div>
         <paper-input value="{{transaction.date}}" label="Date"></paper-input>
         <paper-input value="{{transaction.description}}" label="Description"></paper-input>
@@ -19,9 +20,17 @@
       </div>
     </paper-dialog>
   </template>
-  <script> 
-    class PfTransactionsForm extends Aydin.FirebaseMixin(Polymer.Element) {
+  <script>
+    class PfTransactionsForm extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
       
+      get defaultValues() {
+        return {
+          date: '',
+          description: '',
+          amount: ''
+        };
+      }
+
       static get is() {
         return 'pf-transactions-form';
       }
@@ -30,23 +39,57 @@
         return {
           transaction: {
             type: Object,
-            value: () => ({
-              date: '',
-              description: '',
-              amount: ''
-            })
+            value: () => this.defaultValues
           },
           opened: {
             type: Boolean,
             value: false,
-            notify: true
+            notify: true,
+            computed: 'computeFromState(state.transactions.form.opened)',
+            observer: '_onOpenedChanged'
+          },
+          editKey: {
+            type: String,
+            value: null,
+            computed: 'computeFromState(state.transactions.form.editKey)',
+            observer: '_onEditKeyChanged'
           }
         }
       }
 
       _onSaveTapped() {
-        this.pushNode('transactions', this.get('transaction'));
-        this.opened = false;
+        if(this.editKey) {
+          const updates = {};
+          updates[`transactions/${this.editKey}`] = this.transaction;
+          this.updateNodes(updates);
+        } else {
+          this.pushNode('transactions', this.get('transaction'));
+        }
+        this._resetForm();
+      }
+
+      _onEditKeyChanged(newKey, oldKey) {
+        if(newKey !== oldKey) {
+          if(newKey) {
+            this.set('transaction', this.state.transactions.data.find(e => e.key === newKey).data);
+          } else {
+            this.set('transaction', this.defaultValues);
+          }
+        }
+      }
+
+      _computeTitle(editKey) {
+        return editKey ? 'Edit transaction' : 'Add transaction';
+      }
+
+      _resetForm() {
+        this.dispatch({type:TRANSACTION.FORM.RESET});
+      }
+
+      _onOpenedChanged(opened) {
+        if(opened === false) {
+          this.set('transaction', this.defaultValues);
+        }
       }
 
     }

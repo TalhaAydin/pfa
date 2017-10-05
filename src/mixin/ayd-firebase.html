@@ -47,6 +47,10 @@
         return this.nodeRef(nodeLocation).remove();
       }
 
+      updateNodes(updates) {
+        return this.nodeRef().update(updates);
+      }
+
     });
   })(window.firebase);
 

@@ -158,11 +158,11 @@
       }
 
       _onEditTapped() {
-        console.log('Not implemented yet!');
+        this.dispatch({type: TRANSACTION.FORM.EDIT, payload: this.state.transactions.selected[0]});
       }
 
       _onFabTapped() {
-        this.$.transactions.formOpened = true;
+        this.dispatch({type: TRANSACTION.FORM.NEW});
       }
 
     }
