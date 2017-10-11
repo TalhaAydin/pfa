@@ -65,7 +65,6 @@
         } else {
           this.pushNode('transactions', this.get('transaction'));
         }
-        this._resetForm();
       }
 
       _onEditKeyChanged(newKey, oldKey) {
@@ -82,14 +81,15 @@
         return editKey ? 'Edit transaction' : 'Add transaction';
       }
 
-      _resetForm() {
-        this.dispatch({type:TRANSACTION.FORM.RESET});
-      }
-
       _onOpenedChanged(opened) {
         if(opened === false) {
-          this.set('transaction', this.defaultValues);
+          this._resetForm();
         }
+      }
+
+      _resetForm() {
+        this.dispatch({type:TRANSACTION.FORM.RESET});
+        this.set('transaction', this.defaultValues);
       }
 
     }
