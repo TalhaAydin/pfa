@@ -39,6 +39,10 @@
         this.nodeRef(nodeLocation).on('child_removed', callback);
       }
 
+      onChildNodeChanged(nodeLocation, callback) {
+        this.nodeRef(nodeLocation).on('child_changed', callback);
+      }
+
       pushNode(nodeLocation, varToPush) {
         return this.nodeRef(nodeLocation).push().set(varToPush);
       }
