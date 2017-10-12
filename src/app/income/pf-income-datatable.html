@@ -1,0 +1,55 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../component/ayd-datatable.html">
+<link rel="import" href="../../mixin/ayd-firebase.html">
+<link rel="import" href="../../mixin/ayd-redux.html">
+
+<dom-module id="pf-income-datatable">
+  <script> 
+    class PfIncomeDatatable extends Aydin.ReduxMixin(Aydin.FirebaseMixin(AydDatatable)) {
+
+      static get is() {
+        return 'pf-income-datatable';
+      }
+
+      ready() {
+        super.ready();
+        this.onChildNodeAdded('income', data => this.dispatch({ type: INCOME.ADD, payload: { key: data.key, data: data.val() } }));
+        this.onChildNodeRemoved('income', data => this.dispatch({ type: INCOME.REMOVE, payload: data.key }));
+        this.onChildNodeChanged('income', data => this.dispatch({ type: INCOME.CHANGE, payload: { key: data.key, data: data.val() } }));
+      }
+
+      static get properties() {
+        return {
+          fields: {
+            type: Array,
+            readOnly: true,
+            value: () => ({
+              'frequency': 'Frequency',
+              'description': 'Description',
+              'amount': 'Amount'
+            })
+          },
+          data: {
+            type: Array,
+            value: () => [],
+            computed: 'computeFromState(state.income.data)',
+            observer: '_onDataChanged'
+          },
+          selected: {
+            type: Array,
+            value: () => [],
+            observer: '_onSelectedChanged'
+          }
+        }
+      }
+
+      _onSelectedChanged(newValue = [], oldValue = []) {
+        if(newValue.length !== oldValue.length) {
+          this.dispatch({type: INCOME.SELECT, payload: newValue});
+        }
+      }
+
+    }
+    window.customElements.define(PfIncomeDatatable.is, PfIncomeDatatable);
+  </script>
+</dom-module>

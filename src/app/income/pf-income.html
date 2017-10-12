@@ -1,0 +1,36 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="pf-income-datatable.html">
+<link rel="import" href="pf-income-form.html">
+
+<dom-module id="pf-income">
+  <template>
+    <pf-income-datatable id="datatable"></pf-income-datatable>
+    <pf-income-form id="form" opened="{{formOpened}}"></pf-income-form>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class PfIncome extends Polymer.Element {
+      
+      static get is() {
+        return 'pf-income';
+      }
+      
+      static get properties() {
+        return {
+          formOpened: {
+            type: Boolean,
+            value: false,
+            notify: true
+          }
+        }
+      }
+
+    }
+
+    window.customElements.define(PfIncome.is, PfIncome);
+  </script>
+</dom-module>

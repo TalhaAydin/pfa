@@ -1,0 +1,98 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../mixin/ayd-firebase.html">
+<link rel="import" href="../../mixin/ayd-redux.html">
+
+<dom-module id="pf-income-form">
+  <template>
+    <paper-dialog opened="[[opened]]" on-iron-overlay-closed="_resetForm">
+      <h2>[[_computeTitle(editKey)]]</h2>
+      <div>
+          <paper-input value="{{income.frequency}}" label="Frequency"></paper-input>
+        <paper-input value="{{income.description}}" label="Description"></paper-input>
+        <paper-input value="{{income.amount}}" label="Amount"></paper-input>
+      </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm autofocus on-tap="_onSaveTapped">Save</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script>
+    class PfIncomeForm extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
+      
+      get defaultValues() {
+        return {
+          frequency: '',
+          description: '',
+          amount: ''
+        };
+      }
+
+      static get is() {
+        return 'pf-income-form';
+      }
+
+      static get properties() {
+        return {
+          income: {
+            type: Object,
+            value: () => this.defaultValues
+          },
+          opened: {
+            type: Boolean,
+            value: false,
+            notify: true,
+            computed: 'computeFromState(state.income.form.opened)',
+            observer: '_onOpenedChanged'
+          },
+          editKey: {
+            type: String,
+            value: null,
+            computed: 'computeFromState(state.income.form.editKey)',
+            observer: '_onEditKeyChanged'
+          }
+        }
+      }
+
+      _onSaveTapped() {
+        if(this.editKey) {
+          const updates = {};
+          updates[`income/${this.editKey}`] = this.income;
+          this.updateNodes(updates);
+        } else {
+          this.pushNode('income', this.get('income'));
+        }
+      }
+
+      _onEditKeyChanged(newKey, oldKey) {
+        if(newKey !== oldKey) {
+          if(newKey) {
+            this.set('income', this.state.income.data.find(e => e.key === newKey).data);
+          } else {
+            this.set('income', this.defaultValues);
+          }
+        }
+      }
+
+      _computeTitle(editKey) {
+        return editKey ? 'Edit income' : 'Add income';
+      }
+
+      _onOpenedChanged(opened) {
+        if(opened === false) {
+          this._resetForm();
+        }
+      }
+
+      _resetForm() {
+        this.dispatch({type:INCOME.FORM.RESET});
+        this.set('income', this.defaultValues);
+      }
+
+    }
+    window.customElements.define(PfIncomeForm.is, PfIncomeForm);
+  </script>
+</dom-module>
