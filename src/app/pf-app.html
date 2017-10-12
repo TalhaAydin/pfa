@@ -87,8 +87,8 @@
             <paper-listbox selected="1" on-tap="_onNavigationClicked">
               <paper-item target="dashboard">Dashboard</paper-item>
               <paper-item target="transactions">All transactions</paper-item>
-              <paper-item target="expenses">Monthly expenses</paper-item>
-              <paper-item target="income">Monthly income</paper-item>
+              <paper-item target="expenses">Expenses</paper-item>
+              <paper-item target="income">Income</paper-item>
               <paper-item target="help">Help</paper-item>
             </paper-listbox>
           </app-drawer>
@@ -136,8 +136,8 @@
         const titles = {
           transactions: 'All transactions',
           dashboard: 'Dashboard',
-          expenses: 'Monthly expenses',
-          income: 'Monthly income',
+          expenses: 'Expenses',
+          income: 'Income',
           help: 'Help'
         }
         return titles[selectedPage] ? titles[selectedPage] : 'No title';
