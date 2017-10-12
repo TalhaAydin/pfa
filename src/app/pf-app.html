@@ -10,6 +10,7 @@
 <link rel="import" href="../mixin/ayd-firebase.html">
 <link rel="import" href="../mixin/ayd-redux.html">
 <link rel="import" href="./transactions/pf-transactions.html">
+<link rel="import" href="./expenses/pf-expenses.html">
 
 <dom-module id="pf-app">
   <template>
@@ -94,7 +95,7 @@
             <iron-pages id="pages" selected="{{selectedPage}}" attr-for-selected="name">
               <div name="dashboard" id="dashboard">DASHBOARD PLACEHOLDER</div>
               <pf-transactions name="transactions" id="transactions"></pf-transactions>
-              <div name="expenses" id="expenses">EXPENSES PLACEHOLDER</div>
+              <pf-expenses name="expenses" id="expenses"></pf-expenses>
               <div name="income" id="income">INCOME PLACEHOLDER</div>
               <div name="help" id="help">HELP PLACEHOLDER</div>
             </iron-pages>

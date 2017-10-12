@@ -1,0 +1,36 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="pf-expenses-datatable.html">
+<link rel="import" href="pf-expenses-form.html">
+
+<dom-module id="pf-expenses">
+  <template>
+    <pf-expenses-datatable id="datatable"></pf-expenses-datatable>
+    <pf-expenses-form id="form" opened="{{formOpened}}"></pf-expenses-form>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class PfExpenses extends Polymer.Element {
+      
+      static get is() {
+        return 'pf-expenses';
+      }
+      
+      static get properties() {
+        return {
+          formOpened: {
+            type: Boolean,
+            value: false,
+            notify: true
+          }
+        }
+      }
+
+    }
+
+    window.customElements.define(PfExpenses.is, PfExpenses);
+  </script>
+</dom-module>
