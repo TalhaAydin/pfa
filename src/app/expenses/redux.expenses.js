@@ -1,12 +1,12 @@
-var EXPENSE = {
-  ADD: 'EXPENSE.ADD', // Adds single expense
-  REMOVE: 'EXPENSE.REMOVE', // Removes single expense
-  CHANGE: 'EXPENSE.CHANGE', // Replace single expense
-  SELECT: 'EXPENSE.SELECT', // Sets new selected array
+var EXPENSES = {
+  ADD: 'EXPENSES.ADD', // Adds single expense
+  REMOVE: 'EXPENSES.REMOVE', // Removes single expense
+  CHANGE: 'EXPENSES.CHANGE', // Replace single expense
+  SELECT: 'EXPENSES.SELECT', // Sets new selected array
   FORM: {
-    NEW: 'EXPENSE.FORM.NEW',
-    EDIT: 'EXPENSE.FORM.EDIT',
-    RESET: 'EXPENSE.FORM.RESET'
+    NEW: 'EXPENSES.FORM.NEW',
+    EDIT: 'EXPENSES.FORM.EDIT',
+    RESET: 'EXPENSES.FORM.RESET'
   }
 }
 
@@ -16,7 +16,7 @@ var expensesReducer = function (state = {
   selected: [],
   form: { opened: false, editKey: null }
 }, action) {
-  const { ADD, SELECT, REMOVE, CHANGE, FORM } = EXPENSE;
+  const { ADD, SELECT, REMOVE, CHANGE, FORM } = EXPENSES;
   switch (action.type) {
     case ADD:
       return Object.assign({}, state, { data: [...state.data, action.payload] });

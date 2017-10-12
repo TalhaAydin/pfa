@@ -1,12 +1,12 @@
-var TRANSACTION = {
-  ADD: 'TRANSACTION.ADD', // Adds single transaction
-  REMOVE: 'TRANSACTION.REMOVE', // Removes single transaction
-  CHANGE: 'TRANSACTION.CHANGE', // Replace single transaction
-  SELECT: 'TRANSACTION.SELECT', // Sets new selected array
+var TRANSACTIONS = {
+  ADD: 'TRANSACTIONS.ADD', // Adds single transaction
+  REMOVE: 'TRANSACTIONS.REMOVE', // Removes single transaction
+  CHANGE: 'TRANSACTIONS.CHANGE', // Replace single transaction
+  SELECT: 'TRANSACTIONS.SELECT', // Sets new selected array
   FORM: {
-    NEW: 'TRANSACTION.FORM.NEW',
-    EDIT: 'TRANSACTION.FORM.EDIT',
-    RESET: 'TRANSACTION.FORM.RESET'
+    NEW: 'TRANSACTIONS.FORM.NEW',
+    EDIT: 'TRANSACTIONS.FORM.EDIT',
+    RESET: 'TRANSACTIONS.FORM.RESET'
   }
 }
 
@@ -16,7 +16,7 @@ var transactionsReducer = function (state = {
   selected: [],
   form: { opened: false, editKey: null }
 }, action) {
-  const { ADD, SELECT, REMOVE, CHANGE, FORM } = TRANSACTION;
+  const { ADD, SELECT, REMOVE, CHANGE, FORM } = TRANSACTIONS;
   switch (action.type) {
     case ADD:
       return Object.assign({}, state, { data: [...state.data, action.payload] });

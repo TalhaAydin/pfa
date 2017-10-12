@@ -72,13 +72,13 @@
     </style>
     
       <app-header-layout fullbleed>
-        <app-header fixed slot="header" has-selected-data$="[[_computeHasSelected(state.transactions.selected)]]">
+        <app-header fixed slot="header" has-selected-data$="[[_computeHasSelected(state, selectedPage)]]">
           <app-toolbar>
             <div main-title>
-              [[_computeTitle(selectedPage)]] [[_computeSelectedTitle(state.transactions.selected)]]
+              [[_computeTitle(selectedPage)]] [[_computeSelectedTitle(state, selectedPage)]]
             </div>
-            <paper-icon-button visible$="[[_computeHasOneSelected(state.transactions.selected)]]" id="edit-button" icon="icons:create" on-tap="_onEditTapped"></paper-icon-button>
-            <paper-icon-button visible$="[[_computeHasSelected(state.transactions.selected)]]" id="delete-button" icon="icons:delete" on-tap="_onDeleteTapped"></paper-icon-button>
+            <paper-icon-button visible$="[[_computeHasOneSelected(state, selectedPage)]]" id="edit-button" icon="icons:create" on-tap="_onEditTapped"></paper-icon-button>
+            <paper-icon-button visible$="[[_computeHasSelected(state, selectedPage)]]" id="delete-button" icon="icons:delete" on-tap="_onDeleteTapped"></paper-icon-button>
           </app-toolbar>
         </app-header>
         <app-drawer-layout>
@@ -142,28 +142,36 @@
         return titles[selectedPage] ? titles[selectedPage] : 'No title';
       }
 
-      _computeSelectedTitle(selected = []) {
-        return selected.length > 0 ? `(${selected.length} selected)` : '';
+      _computeSelectedTitle(state, selectedPage) {
+        const count = this._getSelectedCount(state, selectedPage);
+        return count > 0 ? `(${count} selected)` : '';
       }
 
-      _computeHasSelected(selected = []) {
-        return selected.length > 0;
+      _computeHasSelected(state, selectedPage) {
+        return this._getSelectedCount(state, selectedPage) > 0;
       }
 
-      _computeHasOneSelected(selected = []) {
-        return selected.length === 1;
+      _computeHasOneSelected(state, selectedPage) {
+        return this._getSelectedCount(state, selectedPage) === 1;
       }
 
       _onDeleteTapped() {
-        this.get('state.transactions.selected').forEach(key => this.removeNode(`transactions/${key}`));
+        this.get(`state.${this.selectedPage}.selected`).forEach(key => this.removeNode(`${this.selectedPage}/${key}`));
       }
 
       _onEditTapped() {
-        this.dispatch({type: TRANSACTION.FORM.EDIT, payload: this.state.transactions.selected[0]});
+        const state = this.state[this.selectedPage];
+        const action = window[this.selectedPage.toUpperCase()];
+        this.dispatch({type: action.FORM.EDIT, payload: state.selected[0]});
       }
 
       _onFabTapped() {
-        this.dispatch({type: TRANSACTION.FORM.NEW});
+        const action = window[this.selectedPage.toUpperCase()];
+        this.dispatch({type: action.FORM.NEW});
+      }
+
+      _getSelectedCount(state, selectedPage) {
+        return state && state[selectedPage] ? state[selectedPage].selected.length : 0;
       }
 
     }

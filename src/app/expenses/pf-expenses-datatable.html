@@ -13,9 +13,9 @@
 
       ready() {
         super.ready();
-        this.onChildNodeAdded('expenses', data => this.dispatch({ type: EXPENSE.ADD, payload: { key: data.key, data: data.val() } }));
-        this.onChildNodeRemoved('expenses', data => this.dispatch({ type: EXPENSE.REMOVE, payload: data.key }));
-        this.onChildNodeChanged('expenses', data => this.dispatch({ type: EXPENSE.CHANGE, payload: { key: data.key, data: data.val() } }));
+        this.onChildNodeAdded('expenses', data => this.dispatch({ type: EXPENSES.ADD, payload: { key: data.key, data: data.val() } }));
+        this.onChildNodeRemoved('expenses', data => this.dispatch({ type: EXPENSES.REMOVE, payload: data.key }));
+        this.onChildNodeChanged('expenses', data => this.dispatch({ type: EXPENSES.CHANGE, payload: { key: data.key, data: data.val() } }));
       }
 
       static get properties() {
@@ -45,7 +45,7 @@
 
       _onSelectedChanged(newValue = [], oldValue = []) {
         if(newValue.length !== oldValue.length) {
-          this.dispatch({type: EXPENSE.SELECT, payload: newValue});
+          this.dispatch({type: EXPENSES.SELECT, payload: newValue});
         }
       }
 

@@ -13,9 +13,9 @@
 
       ready() {
         super.ready();
-        this.onChildNodeAdded('transactions', data => this.dispatch({ type: TRANSACTION.ADD, payload: { key: data.key, data: data.val() } }));
-        this.onChildNodeRemoved('transactions', data => this.dispatch({ type: TRANSACTION.REMOVE, payload: data.key }));
-        this.onChildNodeChanged('transactions', data => this.dispatch({ type: TRANSACTION.CHANGE, payload: { key: data.key, data: data.val() } }));
+        this.onChildNodeAdded('transactions', data => this.dispatch({ type: TRANSACTIONS.ADD, payload: { key: data.key, data: data.val() } }));
+        this.onChildNodeRemoved('transactions', data => this.dispatch({ type: TRANSACTIONS.REMOVE, payload: data.key }));
+        this.onChildNodeChanged('transactions', data => this.dispatch({ type: TRANSACTIONS.CHANGE, payload: { key: data.key, data: data.val() } }));
       }
 
       static get properties() {
@@ -45,7 +45,7 @@
 
       _onSelectedChanged(newValue = [], oldValue = []) {
         if(newValue.length !== oldValue.length) {
-          this.dispatch({type: TRANSACTION.SELECT, payload: newValue});
+          this.dispatch({type: TRANSACTIONS.SELECT, payload: newValue});
         }
       }
 
