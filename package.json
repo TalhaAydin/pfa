@@ -12,5 +12,10 @@
   },
   "author": "Talha Aydin <talha@aydin.pro>",
   "license": "ISC",
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^4.8.0",
+    "eslint-config-airbnb-base": "^12.0.2",
+    "eslint-plugin-html": "^3.2.2",
+    "eslint-plugin-import": "^2.7.0"
+  }
 }

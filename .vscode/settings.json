@@ -1,0 +1,16 @@
+{
+    "eslint.options": {
+        "extensions": [
+            ".html",
+            ".js"
+        ]
+    },
+    "eslint.validate": [
+        {
+            "language": "html"
+        },
+        {
+            "language": "javascript"
+        }
+    ]
+}
