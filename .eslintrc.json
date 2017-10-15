@@ -5,5 +5,9 @@
     },
     "plugins": [
         "html"
-    ]
+    ],
+    "globals": {
+        "Aydin": false,
+        "Polymer": false
+    }
 }
