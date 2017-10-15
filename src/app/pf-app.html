@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/app-layout/app-layout.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
@@ -50,14 +51,37 @@
         margin-top: 64px;
       }
 
+      app-drawer > paper-listbox > paper-item ~ paper-item {
+        border-top: solid 1px var(--divider-color);
+      }
+
+      app-drawer > paper-listbox iron-collapse {
+        margin-left: 16px;
+      }
+
+      app-drawer > paper-listbox paper-listbox {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      app-drawer > paper-listbox paper-listbox paper-item {
+        --paper-item: {
+          color: var(--secondary-text-color);
+        }
+        --paper-item-selected: {
+          color: var(--primary-color);
+        }
+      }
+
       app-drawer {
         border-right: solid 1px var(--divider-color);
       }
 
       app-drawer paper-item {
-        border-bottom: solid 1px var(--divider-color);
-        @apply --paper-font-menu;
-        cursor: pointer;
+        --paper-item: {
+          @apply --paper-font-menu;
+          cursor: pointer;
+        }
         --paper-item-selected: {
           color: var(--primary-color);
         }
@@ -84,23 +108,32 @@
         </app-header>
         <app-drawer-layout>
           <app-drawer slot="drawer">
-            <paper-listbox selected="1" on-tap="_onNavigationClicked">
+            <paper-listbox selected="1" on-tap="_onNavigationTapped">
               <paper-item target="dashboard">Dashboard</paper-item>
-              <paper-item target="transactions">All transactions</paper-item>
-              <paper-item target="expenses">Expenses</paper-item>
-              <paper-item target="income">Income</paper-item>
-              <paper-item target="settings">Settings</paper-item>
-              <paper-item target="help">Help</paper-item>
+              <paper-item target="cashflow">Cashflow</paper-item>
+              <iron-collapse name="cashflow" opened>
+                <paper-listbox selected="0" on-tap="_onNavigationTapped">
+                  <paper-item target="transactions">All transactions</paper-item>
+                  <paper-item target="expenses">Fixed expenses</paper-item>
+                  <paper-item target="income">Fixed income</paper-item>
+                </paper-listbox>
+              </iron-collapse>
+              <paper-item target="balance">Balance</paper-item>
+              <iron-collapse name="balance" opened>
+                <paper-listbox on-tap="_onNavigationTapped">
+                  <paper-item target="summary">Summary</paper-item>
+                  <paper-item target="assets">Assets</paper-item>
+                  <paper-item target="liabilities">Liabilities</paper-item>
+                </paper-listbox>
+              </iron-collapse>
             </paper-listbox>
           </app-drawer>
           <main>
-            <iron-pages id="pages" selected="{{selectedPage}}" attr-for-selected="name">
-              <div name="dashboard" id="dashboard">DASHBOARD PLACEHOLDER</div>
+            <iron-pages id="pages" selected="{{selectedPage}}" attr-for-selected="name" fallback-selection="error">
               <pf-transactions name="transactions" id="transactions"></pf-transactions>
               <pf-expenses name="expenses" id="expenses"></pf-expenses>
-              <pf-income name="income" id="income">INCOME PLACEHOLDER</pf-income>
-              <div name="settings" id="settings">SETTINGS PLACEHOLDER</div>
-              <div name="help" id="help">HELP PLACEHOLDER</div>
+              <pf-income name="income" id="income"></pf-income>
+              <div name="error">Error: Page not found</div>
             </iron-pages>
           </main>
         </app-drawer-layout>
@@ -116,8 +149,7 @@
      * @polymer
      */
     class PfApp extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
-      
-      static get is() { 
+      static get is() {
         return 'pf-app';
       }
 
@@ -125,13 +157,19 @@
         return {
           selectedPage: {
             type: String,
-            value: "transactions"
-          }
-        }
+            value: 'transactions',
+          },
+        };
       }
 
-      _onNavigationClicked(e) {
-        this.set('selectedPage', e.target.getAttribute('target'));
+      _onNavigationTapped(e) {
+        const target = e.target.getAttribute('target');
+        const ironCollapse = e.target.parentNode.querySelector(`iron-collapse[name="${target}"]`);
+        if (ironCollapse) {
+          ironCollapse.toggle();
+        } else {
+          this.set('selectedPage', target);
+        }
       }
 
       _computeTitle(selectedPage) {
