@@ -14,21 +14,19 @@
      * @polymer
      */
     class PfExpenses extends Polymer.Element {
-      
       static get is() {
         return 'pf-expenses';
       }
-      
+
       static get properties() {
         return {
           formOpened: {
             type: Boolean,
             value: false,
-            notify: true
-          }
-        }
+            notify: true,
+          },
+        };
       }
-
     }
 
     window.customElements.define(PfExpenses.is, PfExpenses);

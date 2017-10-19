@@ -5,15 +5,14 @@
     window.Aydin = {};
   }
 
-  Aydin.ReduxMixin = (function (reduxStore) {
+  Aydin.ReduxMixin = (function ReduxMixin(reduxStore) {
     return Polymer.dedupingMixin(base => class extends base {
-
       static get properties() {
         return {
-          "state": {
-            type: Object
-          }
-        }
+          state: {
+            type: Object,
+          },
+        };
       }
 
       ready() {
@@ -28,8 +27,7 @@
       computeFromState(path) {
         return path;
       }
-
     });
-  })(window.reduxStore);
+  }(window.reduxStore));
 
 </script>

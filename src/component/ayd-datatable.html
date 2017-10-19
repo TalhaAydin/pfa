@@ -94,17 +94,17 @@
           data: {
             type: Array,
             value: () => [],
-            observer: '_onDataChanged'
+            observer: '_onDataChanged',
           },
           selected: {
             type: Array,
             value: () => [],
-            notify: true
+            notify: true,
           },
           fields: {
-            type: Array
-          }
-        }
+            type: Array,
+          },
+        };
       }
 
       _getData(obj, field) {
@@ -120,17 +120,17 @@
       }
 
       _onRowCheckboxChanged(e) {
-        const key = e.model.row.key;
-        if(this.selected.includes(key)) {
-          this.selected = [...this.selected.filter(e => e !== key)];
+        const { key } = e.model.row;
+        if (this.selected.includes(key)) {
+          this.selected = [...this.selected.filter(k => k !== key)];
         } else {
           this.selected = [...this.selected, key];
         }
       }
 
       _onMainCheckboxChanged(e) {
-        if(e.target.checked) {
-          this.selected = this.data.map(e => e.key);
+        if (e.target.checked) {
+          this.selected = this.data.map(d => d.key);
         } else {
           this.selected = [];
         }
@@ -145,12 +145,11 @@
       }
 
       _onDataChanged(newValue = [], oldValue = []) {
-        if(newValue.length !== oldValue.length && this.selected.length > 0) {
+        if (newValue.length !== oldValue.length && this.selected.length > 0) {
           const allKeys = newValue.map(e => e.key);
           this.selected = this.selected.filter(key => allKeys.includes(key));
         }
       }
-
     }
     customElements.define(AydDatatable.is, AydDatatable);
   </script>

@@ -4,15 +4,16 @@
 <link rel="import" href="../../mixin/ayd-redux.html">
 
 <dom-module id="pf-expenses-datatable">
-  <script> 
+  <script>
+    /* global AydDatatable */
     class PfExpensesDatatable extends Aydin.ReduxMixin(Aydin.FirebaseMixin(AydDatatable)) {
-
       static get is() {
         return 'pf-expenses-datatable';
       }
 
       ready() {
         super.ready();
+        const { EXPENSES } = window;
         this.onChildNodeAdded('expenses', data => this.dispatch({ type: EXPENSES.ADD, payload: { key: data.key, data: data.val() } }));
         this.onChildNodeRemoved('expenses', data => this.dispatch({ type: EXPENSES.REMOVE, payload: data.key }));
         this.onChildNodeChanged('expenses', data => this.dispatch({ type: EXPENSES.CHANGE, payload: { key: data.key, data: data.val() } }));
@@ -24,31 +25,31 @@
             type: Array,
             readOnly: true,
             value: () => ({
-              'frequency': 'Frequency',
-              'description': 'Description',
-              'amount': 'Amount'
-            })
+              frequency: 'Frequency',
+              description: 'Description',
+              amount: 'Amount',
+            }),
           },
           data: {
             type: Array,
             value: () => [],
             computed: 'computeFromState(state.expenses.data)',
-            observer: '_onDataChanged'
+            observer: '_onDataChanged',
           },
           selected: {
             type: Array,
             value: () => [],
-            observer: '_onSelectedChanged'
-          }
-        }
+            observer: '_onSelectedChanged',
+          },
+        };
       }
 
       _onSelectedChanged(newValue = [], oldValue = []) {
-        if(newValue.length !== oldValue.length) {
-          this.dispatch({type: EXPENSES.SELECT, payload: newValue});
+        if (newValue.length !== oldValue.length) {
+          const { EXPENSES } = window;
+          this.dispatch({ type: EXPENSES.SELECT, payload: newValue });
         }
       }
-
     }
     window.customElements.define(PfExpensesDatatable.is, PfExpensesDatatable);
   </script>

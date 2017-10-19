@@ -14,21 +14,19 @@
      * @polymer
      */
     class PfIncome extends Polymer.Element {
-      
       static get is() {
         return 'pf-income';
       }
-      
+
       static get properties() {
         return {
           formOpened: {
             type: Boolean,
             value: false,
-            notify: true
-          }
-        }
+            notify: true,
+          },
+        };
       }
-
     }
 
     window.customElements.define(PfIncome.is, PfIncome);

@@ -22,12 +22,11 @@
   </template>
   <script>
     class PfExpensesForm extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
-      
       get defaultValues() {
         return {
           frequency: '',
           description: '',
-          amount: ''
+          amount: '',
         };
       }
 
@@ -39,26 +38,26 @@
         return {
           expense: {
             type: Object,
-            value: () => this.defaultValues
+            value: () => this.defaultValues,
           },
           opened: {
             type: Boolean,
             value: false,
             notify: true,
             computed: 'computeFromState(state.expenses.form.opened)',
-            observer: '_onOpenedChanged'
+            observer: '_onOpenedChanged',
           },
           editKey: {
             type: String,
             value: null,
             computed: 'computeFromState(state.expenses.form.editKey)',
-            observer: '_onEditKeyChanged'
-          }
-        }
+            observer: '_onEditKeyChanged',
+          },
+        };
       }
 
       _onSaveTapped() {
-        if(this.editKey) {
+        if (this.editKey) {
           const updates = {};
           updates[`expenses/${this.editKey}`] = this.expense;
           this.updateNodes(updates);
@@ -68,8 +67,8 @@
       }
 
       _onEditKeyChanged(newKey, oldKey) {
-        if(newKey !== oldKey) {
-          if(newKey) {
+        if (newKey !== oldKey) {
+          if (newKey) {
             this.set('expense', this.state.expenses.data.find(e => e.key === newKey).data);
           } else {
             this.set('expense', this.defaultValues);
@@ -82,16 +81,16 @@
       }
 
       _onOpenedChanged(opened) {
-        if(opened === false) {
+        if (opened === false) {
           this._resetForm();
         }
       }
 
       _resetForm() {
-        this.dispatch({type:EXPENSES.FORM.RESET});
+        const { EXPENSES } = window;
+        this.dispatch({ type: EXPENSES.FORM.RESET });
         this.set('expense', this.defaultValues);
       }
-
     }
     window.customElements.define(PfExpensesForm.is, PfExpensesForm);
   </script>

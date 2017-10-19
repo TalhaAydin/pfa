@@ -4,15 +4,16 @@
 <link rel="import" href="../../mixin/ayd-redux.html">
 
 <dom-module id="pf-income-datatable">
-  <script> 
+  <script>
+    /* global AydDatatable */
     class PfIncomeDatatable extends Aydin.ReduxMixin(Aydin.FirebaseMixin(AydDatatable)) {
-
       static get is() {
         return 'pf-income-datatable';
       }
 
       ready() {
         super.ready();
+        const { INCOME } = window;
         this.onChildNodeAdded('income', data => this.dispatch({ type: INCOME.ADD, payload: { key: data.key, data: data.val() } }));
         this.onChildNodeRemoved('income', data => this.dispatch({ type: INCOME.REMOVE, payload: data.key }));
         this.onChildNodeChanged('income', data => this.dispatch({ type: INCOME.CHANGE, payload: { key: data.key, data: data.val() } }));
@@ -24,31 +25,31 @@
             type: Array,
             readOnly: true,
             value: () => ({
-              'frequency': 'Frequency',
-              'description': 'Description',
-              'amount': 'Amount'
-            })
+              frequency: 'Frequency',
+              description: 'Description',
+              amount: 'Amount',
+            }),
           },
           data: {
             type: Array,
             value: () => [],
             computed: 'computeFromState(state.income.data)',
-            observer: '_onDataChanged'
+            observer: '_onDataChanged',
           },
           selected: {
             type: Array,
             value: () => [],
-            observer: '_onSelectedChanged'
-          }
-        }
+            observer: '_onSelectedChanged',
+          },
+        };
       }
 
       _onSelectedChanged(newValue = [], oldValue = []) {
-        if(newValue.length !== oldValue.length) {
-          this.dispatch({type: INCOME.SELECT, payload: newValue});
+        if (newValue.length !== oldValue.length) {
+          const { INCOME } = window;
+          this.dispatch({ type: INCOME.SELECT, payload: newValue });
         }
       }
-
     }
     window.customElements.define(PfIncomeDatatable.is, PfIncomeDatatable);
   </script>

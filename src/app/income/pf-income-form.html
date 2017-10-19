@@ -22,12 +22,11 @@
   </template>
   <script>
     class PfIncomeForm extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
-      
       get defaultValues() {
         return {
           frequency: '',
           description: '',
-          amount: ''
+          amount: '',
         };
       }
 
@@ -39,26 +38,26 @@
         return {
           income: {
             type: Object,
-            value: () => this.defaultValues
+            value: () => this.defaultValues,
           },
           opened: {
             type: Boolean,
             value: false,
             notify: true,
             computed: 'computeFromState(state.income.form.opened)',
-            observer: '_onOpenedChanged'
+            observer: '_onOpenedChanged',
           },
           editKey: {
             type: String,
             value: null,
             computed: 'computeFromState(state.income.form.editKey)',
-            observer: '_onEditKeyChanged'
-          }
-        }
+            observer: '_onEditKeyChanged',
+          },
+        };
       }
 
       _onSaveTapped() {
-        if(this.editKey) {
+        if (this.editKey) {
           const updates = {};
           updates[`income/${this.editKey}`] = this.income;
           this.updateNodes(updates);
@@ -68,8 +67,8 @@
       }
 
       _onEditKeyChanged(newKey, oldKey) {
-        if(newKey !== oldKey) {
-          if(newKey) {
+        if (newKey !== oldKey) {
+          if (newKey) {
             this.set('income', this.state.income.data.find(e => e.key === newKey).data);
           } else {
             this.set('income', this.defaultValues);
@@ -82,16 +81,16 @@
       }
 
       _onOpenedChanged(opened) {
-        if(opened === false) {
+        if (opened === false) {
           this._resetForm();
         }
       }
 
       _resetForm() {
-        this.dispatch({type:INCOME.FORM.RESET});
+        const { INCOME } = window;
+        this.dispatch({ type: INCOME.FORM.RESET });
         this.set('income', this.defaultValues);
       }
-
     }
     window.customElements.define(PfIncomeForm.is, PfIncomeForm);
   </script>

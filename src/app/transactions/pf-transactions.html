@@ -14,21 +14,19 @@
      * @polymer
      */
     class PfTransactions extends Polymer.Element {
-      
       static get is() {
         return 'pf-transactions';
       }
-      
+
       static get properties() {
         return {
           formOpened: {
             type: Boolean,
             value: false,
-            notify: true
-          }
-        }
+            notify: true,
+          },
+        };
       }
-
     }
 
     window.customElements.define(PfTransactions.is, PfTransactions);

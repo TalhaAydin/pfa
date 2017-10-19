@@ -9,5 +9,9 @@
     "globals": {
         "Aydin": false,
         "Polymer": false
+    },
+    "rules": {
+        "class-methods-use-this": "off",
+        "no-underscore-dangle": "off"
     }
 }

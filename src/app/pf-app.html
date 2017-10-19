@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">  
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../../bower_components/app-layout/app-layout.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
@@ -95,7 +95,7 @@
       }
 
     </style>
-    
+
       <app-header-layout fullbleed>
         <app-header fixed slot="header" has-selected-data$="[[_computeHasSelected(state, selectedPage)]]">
           <app-toolbar>
@@ -178,8 +178,8 @@
           dashboard: 'Dashboard',
           expenses: 'Expenses',
           income: 'Income',
-          help: 'Help'
-        }
+          help: 'Help',
+        };
         return titles[selectedPage] ? titles[selectedPage] : 'No title';
       }
 
@@ -203,18 +203,17 @@
       _onEditTapped() {
         const state = this.state[this.selectedPage];
         const action = window[this.selectedPage.toUpperCase()];
-        this.dispatch({type: action.FORM.EDIT, payload: state.selected[0]});
+        this.dispatch({ type: action.FORM.EDIT, payload: state.selected[0] });
       }
 
       _onFabTapped() {
         const action = window[this.selectedPage.toUpperCase()];
-        this.dispatch({type: action.FORM.NEW});
+        this.dispatch({ type: action.FORM.NEW });
       }
 
       _getSelectedCount(state, selectedPage) {
         return state && state[selectedPage] ? state[selectedPage].selected.length : 0;
       }
-
     }
 
     window.customElements.define(PfApp.is, PfApp);

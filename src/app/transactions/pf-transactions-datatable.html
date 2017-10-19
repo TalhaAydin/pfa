@@ -4,15 +4,16 @@
 <link rel="import" href="../../mixin/ayd-redux.html">
 
 <dom-module id="pf-transactions-datatable">
-  <script> 
+  <script>
+    /* global AydDatatable */
     class PfTransactionsDatatable extends Aydin.ReduxMixin(Aydin.FirebaseMixin(AydDatatable)) {
-
       static get is() {
         return 'pf-transactions-datatable';
       }
 
       ready() {
         super.ready();
+        const { TRANSACTIONS } = window;
         this.onChildNodeAdded('transactions', data => this.dispatch({ type: TRANSACTIONS.ADD, payload: { key: data.key, data: data.val() } }));
         this.onChildNodeRemoved('transactions', data => this.dispatch({ type: TRANSACTIONS.REMOVE, payload: data.key }));
         this.onChildNodeChanged('transactions', data => this.dispatch({ type: TRANSACTIONS.CHANGE, payload: { key: data.key, data: data.val() } }));
@@ -24,31 +25,31 @@
             type: Array,
             readOnly: true,
             value: () => ({
-              'date': 'Date',
-              'description': 'Description',
-              'amount': 'Amount'
-            })
+              date: 'Date',
+              description: 'Description',
+              amount: 'Amount',
+            }),
           },
           data: {
             type: Array,
             value: () => [],
             computed: 'computeFromState(state.transactions.data)',
-            observer: '_onDataChanged'
+            observer: '_onDataChanged',
           },
           selected: {
             type: Array,
             value: () => [],
-            observer: '_onSelectedChanged'
-          }
-        }
+            observer: '_onSelectedChanged',
+          },
+        };
       }
 
       _onSelectedChanged(newValue = [], oldValue = []) {
-        if(newValue.length !== oldValue.length) {
-          this.dispatch({type: TRANSACTIONS.SELECT, payload: newValue});
+        if (newValue.length !== oldValue.length) {
+          const { TRANSACTIONS } = window;
+          this.dispatch({ type: TRANSACTIONS.SELECT, payload: newValue });
         }
       }
-
     }
     window.customElements.define(PfTransactionsDatatable.is, PfTransactionsDatatable);
   </script>
