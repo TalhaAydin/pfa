@@ -15,7 +15,15 @@
     node: 'expenses',
     data: [],
     selected: [],
-    form: { opened: false, editKey: null },
+    form: {
+      opened: false,
+      editKey: null,
+    },
+    fields: {
+      frequency: 'Frequency',
+      description: 'Description',
+      amount: 'Amount',
+    },
   };
 
   const expensesReducer = function expensesReducer(state = defaultState, action) {

@@ -15,7 +15,15 @@
     node: 'transactions',
     data: [],
     selected: [],
-    form: { opened: false, editKey: null },
+    form: {
+      opened: false,
+      editKey: null,
+    },
+    fields: {
+      date: 'Date',
+      description: 'Description',
+      amount: 'Amount',
+    },
   };
 
   const transactionsReducer = function transactionsReducer(state = defaultState, action) {

@@ -1,0 +1,82 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../component/ayd-datatable.html">
+<link rel="import" href="../mixin/ayd-firebase.html">
+<link rel="import" href="../mixin/ayd-redux.html">
+
+<dom-module id="pf-datatable">
+  <template>
+    <ayd-datatable
+      data="[[_computeData(state, dataType)]]"
+      selected="{{selected}}"
+      fields="[[_computeFields(state, dataType)]]">
+    </ayd-datatable>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class PfDatatable extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
+      static get is() {
+        return 'pf-datatable';
+      }
+
+      ready() {
+        super.ready();
+
+        const ACTIONS = window[this.dataType.toUpperCase()];
+
+        this.onChildNodeAdded(this.dataType, data => this.dispatch({
+          type: ACTIONS.ADD,
+          payload: {
+            key: data.key,
+            data: data.val(),
+          },
+        }));
+
+        this.onChildNodeRemoved(this.dataType, data => this.dispatch({
+          type: ACTIONS.REMOVE,
+          payload: data.key,
+        }));
+
+        this.onChildNodeChanged(this.dataType, data => this.dispatch({
+          type: ACTIONS.CHANGE,
+          payload: {
+            key: data.key,
+            data: data.val(),
+          },
+        }));
+      }
+
+      static get properties() {
+        return {
+          dataType: {
+            type: String,
+          },
+          selected: {
+            type: Array,
+            observer: '_onSelectedChanged',
+          },
+        };
+      }
+
+      _onSelectedChanged(newValue = [], oldValue = []) {
+        if (newValue.length !== oldValue.length) {
+          const ACTIONS = window[this.dataType.toUpperCase()];
+          this.dispatch({ type: ACTIONS.SELECT, payload: newValue });
+        }
+      }
+
+      _computeData(state, type) {
+        return state && type ? state[type].data : [];
+      }
+
+      _computeFields(state, type) {
+        return state && type ? state[type].fields : {};
+      }
+    }
+
+    window.customElements.define(PfDatatable.is, PfDatatable);
+  </script>
+</dom-module>

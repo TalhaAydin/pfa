@@ -57,7 +57,7 @@
           <th>
             <paper-checkbox checked="[[_computeIsAllSelected(data, selected)]]" on-change="_onMainCheckboxChanged"></paper-checkbox>
           </th>
-          <template is="dom-repeat" items="[[_getFieldHeaders()]]" as="header">
+          <template is="dom-repeat" items="[[_getFieldHeaders(fields)]]" as="header">
             <th>[[header]]</th>
           </template>
         </tr>
@@ -69,7 +69,7 @@
             <td>
               <paper-checkbox checked="[[_isRowChecked(row.key, selected)]]" on-change="_onRowCheckboxChanged"></paper-checkbox>
             </td>
-            <template is="dom-repeat" items="[[_getFieldKeys()]]" as="fieldKey">
+            <template is="dom-repeat" items="[[_getFieldKeys(fields)]]" as="fieldKey">
               <td>[[_getData(row.data, fieldKey)]]</td>
             </template>
           </tr>
@@ -103,6 +103,7 @@
           },
           fields: {
             type: Array,
+            value: () => ({}),
           },
         };
       }
@@ -111,12 +112,12 @@
         return obj[field];
       }
 
-      _getFieldKeys() {
-        return Object.keys(this.fields);
+      _getFieldKeys(fields) {
+        return Object.keys(fields);
       }
 
-      _getFieldHeaders() {
-        return Object.values(this.fields);
+      _getFieldHeaders(fields) {
+        return Object.values(fields);
       }
 
       _onRowCheckboxChanged(e) {
