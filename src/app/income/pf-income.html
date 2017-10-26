@@ -1,11 +1,19 @@
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../pf-datatable.html">
-<link rel="import" href="pf-income-form.html">
+<link rel="import" href="../pf-form.html">
 
 <dom-module id="pf-income">
   <template>
+
     <pf-datatable id="datatable" data-type="income"></pf-datatable>
-    <pf-income-form id="form" opened="{{formOpened}}"></pf-income-form>
+
+    <pf-form id="form" type="income" data="{{formData}}" defaults="[[formDefaults]]">
+      <paper-input value="{{formData.frequency}}" label="Frequency"></paper-input>
+      <paper-input value="{{formData.description}}" label="Description"></paper-input>
+      <paper-input value="{{formData.amount}}" label="Amount"></paper-input>
+    </pf-form>
+
   </template>
 
   <script>
@@ -20,11 +28,23 @@
 
       static get properties() {
         return {
-          formOpened: {
-            type: Boolean,
-            value: false,
-            notify: true,
+          formData: {
+            type: Object,
+            value: () => PfIncome.formDefaults,
           },
+          formDefaults: {
+            type: Object,
+            readOnly: true,
+            value: () => PfIncome.formDefaults,
+          },
+        };
+      }
+
+      static get formDefaults() {
+        return {
+          frequency: '',
+          description: '',
+          amount: '',
         };
       }
     }

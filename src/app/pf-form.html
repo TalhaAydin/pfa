@@ -1,0 +1,94 @@
+<link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../component/ayd-form.html">
+<link rel="import" href="../mixin/ayd-firebase.html">
+<link rel="import" href="../mixin/ayd-redux.html">
+
+<dom-module id="pf-form">
+
+  <template>
+    <ayd-form
+      title="[[_computeTitle(editKey)]]"
+      opened="{{opened}}"
+      on-save="_onSave">
+      <slot></slot>
+    </ayd-form>
+  </template>
+
+  <script>
+    class PfForm extends Aydin.ReduxMixin(Aydin.FirebaseMixin(Polymer.Element)) {
+      static get is() {
+        return 'pf-form';
+      }
+
+      static get properties() {
+        return {
+          data: {
+            type: Object,
+            notify: true,
+          },
+          type: {
+            type: String,
+          },
+          defaults: {
+            type: Object,
+          },
+          editKey: {
+            type: String,
+            value: null,
+            observer: '_onEditKeyChanged',
+          },
+          opened: {
+            type: Boolean,
+            value: false,
+            observer: '_onOpenedChanged',
+          },
+        };
+      }
+
+      static get observers() {
+        return [
+          '_onStateChanged(state, type)',
+        ];
+      }
+
+      _onStateChanged(state, type) {
+        // Update form opened state from redux state
+        if (state && type) {
+          this.opened = state[type].form.opened;
+          this.editKey = state[type].form.editKey;
+        }
+      }
+
+      _onOpenedChanged(opened) {
+        // Reset redux form state when form is closed
+        if (opened === false) {
+          const ACTIONS = window[this.type.toUpperCase()];
+          this.dispatch({ type: ACTIONS.FORM.RESET });
+          this.data = Object.assign({}, this.defaults);
+        }
+      }
+
+      _onEditKeyChanged(editKey) {
+        if (editKey) {
+          this.data = this.state[this.type].data.find(e => e.key === editKey).data;
+        }
+      }
+
+      _onSave() {
+        if (this.editKey) {
+          this.updateNodes({ [`${this.type}/${this.editKey}`]: this.data });
+        } else {
+          this.pushNode(this.type, this.data);
+        }
+      }
+
+      _computeTitle(editKey) {
+        return editKey ? 'Edit' : 'Add';
+      }
+    }
+    window.customElements.define(PfForm.is, PfForm);
+  </script>
+</dom-module>

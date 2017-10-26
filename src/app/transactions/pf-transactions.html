@@ -1,11 +1,19 @@
 <link rel="import" href="../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../pf-datatable.html">
-<link rel="import" href="pf-transactions-form.html">
+<link rel="import" href="../pf-form.html">
 
 <dom-module id="pf-transactions">
   <template>
+
     <pf-datatable id="datatable" data-type="transactions"></pf-datatable>
-    <pf-transactions-form id="form" opened="{{formOpened}}"></pf-transactions-form>
+
+    <pf-form id="form" type="transactions" data="{{formData}}" defaults="[[formDefaults]]">
+      <paper-input value="{{formData.date}}" label="Date"></paper-input>
+      <paper-input value="{{formData.description}}" label="Description"></paper-input>
+      <paper-input value="{{formData.amount}}" label="Amount"></paper-input>
+    </pf-form>
+
   </template>
 
   <script>
@@ -20,11 +28,23 @@
 
       static get properties() {
         return {
-          formOpened: {
-            type: Boolean,
-            value: false,
-            notify: true,
+          formData: {
+            type: Object,
+            value: () => PfTransactions.formDefaults,
           },
+          formDefaults: {
+            type: Object,
+            readOnly: true,
+            value: () => PfTransactions.formDefaults,
+          },
+        };
+      }
+
+      static get formDefaults() {
+        return {
+          date: '',
+          description: '',
+          amount: '',
         };
       }
     }
