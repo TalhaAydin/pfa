@@ -1,6 +1,6 @@
 {
   const EXPENSES = {
-    ADD: 'EXPENSES.ADD', // Adds single expense
+    ADD: 'EXPENSES.ADD', // Adds one or more expenses
     REMOVE: 'EXPENSES.REMOVE', // Removes single expense
     CHANGE: 'EXPENSES.CHANGE', // Replace single expense
     SELECT: 'EXPENSES.SELECT', // Sets new selected array
@@ -36,7 +36,7 @@
     } = EXPENSES;
     switch (action.type) {
       case ADD:
-        return Object.assign({}, state, { data: [...state.data, action.payload] });
+        return Object.assign({}, state, { data: [...state.data, ...action.payload] });
       case SELECT:
         return Object.assign({}, state, { selected: [...action.payload] });
       case REMOVE:

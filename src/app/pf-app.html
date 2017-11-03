@@ -130,6 +130,7 @@
           </app-drawer>
           <main>
             <iron-pages id="pages" selected="{{selectedPage}}" attr-for-selected="name" fallback-selection="error">
+              <!-- TODO: Lazy load these pages -->
               <pf-transactions name="transactions" id="transactions"></pf-transactions>
               <pf-expenses name="expenses" id="expenses"></pf-expenses>
               <pf-income name="income" id="income"></pf-income>

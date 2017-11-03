@@ -1,6 +1,6 @@
 {
   const TRANSACTIONS = {
-    ADD: 'TRANSACTIONS.ADD', // Adds single transaction
+    ADD: 'TRANSACTIONS.ADD', // Adds one or more transactions
     REMOVE: 'TRANSACTIONS.REMOVE', // Removes single transaction
     CHANGE: 'TRANSACTIONS.CHANGE', // Replace single transaction
     SELECT: 'TRANSACTIONS.SELECT', // Sets new selected array
@@ -32,7 +32,7 @@
     } = TRANSACTIONS;
     switch (action.type) {
       case ADD:
-        return Object.assign({}, state, { data: [...state.data, action.payload] });
+        return Object.assign({}, state, { data: [...state.data, ...action.payload] });
       case SELECT:
         return Object.assign({}, state, { selected: [...action.payload] });
       case REMOVE:

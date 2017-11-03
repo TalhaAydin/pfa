@@ -1,6 +1,6 @@
 {
   const INCOME = {
-    ADD: 'INCOME.ADD', // Adds single income
+    ADD: 'INCOME.ADD', // Adds one or more incomes
     REMOVE: 'INCOME.REMOVE', // Removes single income
     CHANGE: 'INCOME.CHANGE', // Replace single income
     SELECT: 'INCOME.SELECT', // Sets new selected array
@@ -36,7 +36,7 @@
     } = INCOME;
     switch (action.type) {
       case ADD:
-        return Object.assign({}, state, { data: [...state.data, action.payload] });
+        return Object.assign({}, state, { data: [...state.data, ...action.payload] });
       case SELECT:
         return Object.assign({}, state, { selected: [...action.payload] });
       case REMOVE:
