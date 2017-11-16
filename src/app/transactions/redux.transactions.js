@@ -1,8 +1,27 @@
-{
+window.appNs = window.appNs || {};
+
+(function reduxTransactionsJs({ firebase, appNs }) {
   const TRANSACTIONS = {
-    ADD: 'TRANSACTIONS.ADD', // Adds one or more transactions
-    REMOVE: 'TRANSACTIONS.REMOVE', // Removes single transaction
-    CHANGE: 'TRANSACTIONS.CHANGE', // Replace single transaction
+    // Fetches all transactions
+    GET: 'TRANSACTIONS.GET',
+    GET_SUCCEEDED: 'TRANSACTIONS.GET_SUCCEEDED',
+    GET_FAILED: 'TRANSACTIONS.GET_FAILED',
+
+    // Adds a transaction
+    ADD: 'TRANSACTIONS.ADD',
+    ADD_SUCCEEDED: 'TRANSACTIONS.ADD_SUCCEEDED',
+    ADD_FAILED: 'TRANSACTIONS.ADD_FAILED',
+
+    // Removes a transaction
+    REMOVE: 'TRANSACTIONS.REMOVE',
+    REMOVE_SUCCEEDED: 'TRANSACTIONS.REMOVE_SUCCEEDED',
+    REMOVE_FAILED: 'TRANSACTIONS.REMOVE_FAILED',
+
+    // Changes a transaction
+    CHANGE: 'TRANSACTIONS.CHANGE',
+    CHANGE_SUCCEEDED: 'TRANSACTIONS.CHANGE_SUCCEEDED',
+    CHANGE_FAILED: 'TRANSACTIONS.CHANGE_FAILED',
+
     SELECT: 'TRANSACTIONS.SELECT', // Sets new selected array
     FORM: {
       NEW: 'TRANSACTIONS.FORM.NEW',
@@ -11,8 +30,73 @@
     },
   };
 
+  const transactionsActions = {
+    getTransactions() {
+      return (dispatch) => {
+        dispatch({ type: TRANSACTIONS.GET });
+        return firebase.database().ref('transactions').once('value')
+          .then((snapshot) => {
+            const rawData = snapshot.val();
+            const stateData = Object.keys(rawData).map(key => ({ key, data: rawData[key] }));
+            dispatch({ type: TRANSACTIONS.GET_SUCCEEDED, payload: stateData });
+          })
+          .catch((error) => {
+            dispatch({ type: TRANSACTIONS.GET_SUCCEEDED, payload: error });
+          });
+      };
+    },
+    addTransaction(transaction) {
+      return (dispatch) => {
+        dispatch({ type: TRANSACTIONS.ADD });
+        return firebase.database().ref('transactions').push().set(transaction)
+          .then(() => {
+            dispatch({ type: TRANSACTIONS.ADD_SUCCEEDED });
+            dispatch(this.getTransactions());
+            // TODO: Add better UI indication for success
+          })
+          .catch((error) => {
+            dispatch({ type: TRANSACTIONS.ADD_FAILED, payload: error });
+          });
+      };
+    },
+    removeTransactions(keys) {
+      // TODO: Call changeTransactions here?
+      return (dispatch) => {
+        dispatch({ type: TRANSACTIONS.REMOVE });
+        const updates = {};
+        keys.forEach((key) => { updates[`transactions/${key}`] = null; });
+        return firebase.database().ref().update(updates)
+          .then(() => {
+            dispatch({ type: TRANSACTIONS.REMOVE_SUCCEEDED });
+            dispatch(this.getTransactions());
+            // TODO: Add better UI indication for success
+          })
+          .catch((error) => {
+            dispatch({ type: TRANSACTIONS.REMOVE_FAILED, payload: error });
+          });
+      };
+    },
+    changeTransactions(updates) {
+      return (dispatch) => {
+        dispatch({ type: TRANSACTIONS.CHANGE });
+        return firebase.database().ref().update(updates)
+          .then(() => {
+            dispatch({ type: TRANSACTIONS.CHANGE_SUCCEEDED });
+            dispatch(this.getTransactions());
+            // TODO: Add better UI indication for success
+          })
+          .catch((error) => {
+            dispatch({ type: TRANSACTIONS.CHANGE_FAILED, payload: error });
+          });
+      };
+    },
+  };
+
   const defaultState = {
     node: 'transactions',
+    loading: false,
+    error: false,
+    errorDetails: null,
     data: [],
     selected: [],
     form: {
@@ -28,19 +112,38 @@
 
   const transactionsReducer = function transactionsReducer(state = defaultState, action) {
     const {
-      ADD, SELECT, REMOVE, CHANGE, FORM,
+      GET, GET_SUCCEEDED, GET_FAILED,
+      ADD, ADD_SUCCEEDED, ADD_FAILED,
+      REMOVE, REMOVE_SUCCEEDED, REMOVE_FAILED,
+      CHANGE, CHANGE_SUCCEEDED, CHANGE_FAILED,
+      SELECT, FORM,
     } = TRANSACTIONS;
     switch (action.type) {
+      case GET:
       case ADD:
-        return Object.assign({}, state, { data: [...state.data, ...action.payload] });
+      case REMOVE:
+      case CHANGE:
+        return Object.assign({}, state, { loading: true });
+      case GET_SUCCEEDED:
+        return Object.assign(
+          {}, state,
+          { loading: false, data: action.payload },
+        );
+      case GET_FAILED:
+        return Object.assign(
+          {}, state,
+          { loading: false, error: true, errorDetails: action.payload },
+        );
+      case ADD_SUCCEEDED:
+      case REMOVE_SUCCEEDED:
+      case CHANGE_SUCCEEDED:
+        return Object.assign({}, state, { loading: false });
+      case ADD_FAILED:
+      case REMOVE_FAILED:
+      case CHANGE_FAILED:
+        return Object.assign({}, state, { loading: false, error: action.payload });
       case SELECT:
         return Object.assign({}, state, { selected: [...action.payload] });
-      case REMOVE:
-        return Object.assign({}, state, { data: state.data.filter(e => e.key !== action.payload) });
-      case CHANGE: {
-        const newData = state.data.map(e => (e.key === action.payload.key ? action.payload : e));
-        return Object.assign({}, state, { data: newData });
-      }
       case FORM.NEW:
         return Object.assign({}, state, { form: { opened: true, editKey: null } });
       case FORM.EDIT:
@@ -52,6 +155,9 @@
     }
   };
 
-  window.TRANSACTIONS = TRANSACTIONS;
-  window.transactionsReducer = transactionsReducer;
-}
+  // TODO: Variables in ns need better structure
+  const ns = appNs;
+  ns.TRANSACTIONS = TRANSACTIONS;
+  ns.transactionsActions = transactionsActions;
+  ns.transactionsReducer = transactionsReducer;
+}(window));

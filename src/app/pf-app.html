@@ -8,6 +8,7 @@
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../mixin/ayd-firebase.html">
 <link rel="import" href="../mixin/ayd-redux.html">
 <link rel="import" href="./transactions/pf-transactions.html">
@@ -94,6 +95,18 @@
         --paper-fab-background: var(--accent-color);
       }
 
+      paper-progress {
+        display: block;
+        width: 100%;
+        --paper-progress-active-color: var(--accent-color);
+        --paper-progress-indeterminate-cycle-duration: 2s;
+        --paper-progress-container-color: transparent;
+      }
+
+      app-header[has-selected-data] paper-progress {
+        --paper-progress-active-color: var(--primary-color);
+      }
+
     </style>
 
       <app-header-layout fullbleed>
@@ -102,8 +115,10 @@
             <div main-title>
               [[_computeTitle(selectedPage)]] [[_computeSelectedTitle(state, selectedPage)]]
             </div>
+            <!-- TODO: Why didn't I use hidden here? -->
             <paper-icon-button visible$="[[_computeHasOneSelected(state, selectedPage)]]" id="edit-button" icon="icons:create" on-tap="_onEditTapped"></paper-icon-button>
             <paper-icon-button visible$="[[_computeHasSelected(state, selectedPage)]]" id="delete-button" icon="icons:delete" on-tap="_onDeleteTapped"></paper-icon-button>
+            <paper-progress indeterminate bottom-item hidden$="[[!_computeIsLoading(state)]]"></paper-progress>
           </app-toolbar>
         </app-header>
         <app-drawer-layout>
@@ -197,18 +212,26 @@
         return this._getSelectedCount(state, selectedPage) === 1;
       }
 
+      _computeIsLoading(state) {
+        // TODO: Check for more loading states
+        // TODO: Use redux-selector here?
+        const transactionsLoading = state.transactions && state.transactions.loading;
+        return transactionsLoading;
+      }
+
       _onDeleteTapped() {
-        this.get(`state.${this.selectedPage}.selected`).forEach(key => this.removeNode(`${this.selectedPage}/${key}`));
+        const actions = window.appNs[`${this.selectedPage}Actions`];
+        this.dispatch(actions.removeTransactions(this.get(`state.${this.selectedPage}.selected`)));
       }
 
       _onEditTapped() {
         const state = this.state[this.selectedPage];
-        const action = window[this.selectedPage.toUpperCase()];
+        const action = window.appNs[this.selectedPage.toUpperCase()];
         this.dispatch({ type: action.FORM.EDIT, payload: state.selected[0] });
       }
 
       _onFabTapped() {
-        const action = window[this.selectedPage.toUpperCase()];
+        const action = window.appNs[this.selectedPage.toUpperCase()];
         this.dispatch({ type: action.FORM.NEW });
       }
 

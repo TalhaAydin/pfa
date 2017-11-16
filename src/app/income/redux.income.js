@@ -1,3 +1,4 @@
+// TODO: Needs refactoring to catch up with Transactions
 {
   const INCOME = {
     ADD: 'INCOME.ADD', // Adds one or more incomes

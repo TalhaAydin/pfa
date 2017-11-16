@@ -24,73 +24,7 @@
 
       ready() {
         super.ready();
-
-        const ACTIONS = window[this.dataType.toUpperCase()];
-
-        /**
-         * Wraps dispatcher with a debounce to reduce amount of dispatched actions.
-         * TODO: Is there a better way?
-         * TODO: Put this in a Redux middleware
-         */
-        const ActionDispatcher = class ActionDispatcher {
-          constructor(dispatch) {
-            this._dispatch = dispatch;
-          }
-
-          dispatch(action) {
-            this._initPromise(action);
-            this._payloads.push(action.payload);
-            this._setResolveTimeout();
-          }
-
-          _initPromise(action) {
-            if (this._promise && this._resolved !== true) {
-              return;
-            }
-            this._payloads = [];
-            this._resolved = false;
-            this._promise = new Promise((resolve, reject) => {
-              this._resolve = resolve;
-              this._reject = reject;
-            }).then((payload) => {
-              this._resolved = true;
-              this._dispatch({
-                type: action.type,
-                payload,
-              });
-            });
-          }
-
-          _setResolveTimeout() {
-            if (this._timeoutID) {
-              clearTimeout(this._timeoutID);
-            }
-            this._timeoutID = setTimeout(() => { this._resolve(this._payloads); }, 250);
-          }
-        };
-        const actionDispatcher = new ActionDispatcher(this.dispatch);
-
-        // TODO: Display loading animations: Use thunks and promises for async actions.
-        this.onChildNodeAdded(this.dataType, data => actionDispatcher.dispatch({
-          type: ACTIONS.ADD,
-          payload: {
-            key: data.key,
-            data: data.val(),
-          },
-        }));
-
-        this.onChildNodeRemoved(this.dataType, data => this.dispatch({
-          type: ACTIONS.REMOVE,
-          payload: data.key,
-        }));
-
-        this.onChildNodeChanged(this.dataType, data => this.dispatch({
-          type: ACTIONS.CHANGE,
-          payload: {
-            key: data.key,
-            data: data.val(),
-          },
-        }));
+        this.dispatch(window.appNs.transactionsActions.getTransactions());
       }
 
       static get properties() {
@@ -107,7 +41,7 @@
 
       _onSelectedChanged(newValue = [], oldValue = []) {
         if (newValue.length !== oldValue.length) {
-          const ACTIONS = window[this.dataType.toUpperCase()];
+          const ACTIONS = window.appNs[this.dataType.toUpperCase()];
           this.dispatch({ type: ACTIONS.SELECT, payload: newValue });
         }
       }

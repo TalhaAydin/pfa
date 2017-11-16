@@ -1,3 +1,4 @@
+// TODO: Needs refactoring to catch up with Transactions
 {
   const EXPENSES = {
     ADD: 'EXPENSES.ADD', // Adds one or more expenses

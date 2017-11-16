@@ -1,19 +1,23 @@
+// TODO: Make this a function
 {
   const {
     Redux,
-    transactionsReducer,
+    ReduxThunk,
+    appNs,
     expensesReducer,
     incomeReducer,
-    __REDUX_DEVTOOLS_EXTENSION__,
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__,
   } = window;
+
+  const composeEnhancers = __REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || Redux.compose;
 
   const reduxStore = Redux.createStore(
     Redux.combineReducers({
-      transactions: transactionsReducer,
+      transactions: appNs.transactionsReducer,
       expenses: expensesReducer,
       income: incomeReducer,
     }), /* preloaded skipped, */
-    __REDUX_DEVTOOLS_EXTENSION__ && __REDUX_DEVTOOLS_EXTENSION__(),
+    composeEnhancers(Redux.applyMiddleware(ReduxThunk.default)),
   );
 
   window.reduxStore = reduxStore;
