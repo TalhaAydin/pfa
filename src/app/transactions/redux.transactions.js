@@ -42,6 +42,8 @@ window.appNs = window.appNs || {};
           })
           .catch((error) => {
             dispatch({ type: TRANSACTIONS.GET_SUCCEEDED, payload: error });
+            // TODO: Add better UI indication for failure
+            // TODO: Test error flow
           });
       };
     },
@@ -56,6 +58,8 @@ window.appNs = window.appNs || {};
           })
           .catch((error) => {
             dispatch({ type: TRANSACTIONS.ADD_FAILED, payload: error });
+            // TODO: Add better UI indication for failure
+            // TODO: Test error flow
           });
       };
     },
@@ -73,6 +77,8 @@ window.appNs = window.appNs || {};
           })
           .catch((error) => {
             dispatch({ type: TRANSACTIONS.REMOVE_FAILED, payload: error });
+            // TODO: Add better UI indication for failure
+            // TODO: Test error flow
           });
       };
     },
@@ -87,6 +93,8 @@ window.appNs = window.appNs || {};
           })
           .catch((error) => {
             dispatch({ type: TRANSACTIONS.CHANGE_FAILED, payload: error });
+            // TODO: Add better UI indication for failure
+            // TODO: Test error flow
           });
       };
     },
@@ -129,19 +137,18 @@ window.appNs = window.appNs || {};
           {}, state,
           { loading: false, data: action.payload },
         );
-      case GET_FAILED:
-        return Object.assign(
-          {}, state,
-          { loading: false, error: true, errorDetails: action.payload },
-        );
       case ADD_SUCCEEDED:
       case REMOVE_SUCCEEDED:
       case CHANGE_SUCCEEDED:
         return Object.assign({}, state, { loading: false });
+      case GET_FAILED:
       case ADD_FAILED:
       case REMOVE_FAILED:
       case CHANGE_FAILED:
-        return Object.assign({}, state, { loading: false, error: action.payload });
+        return Object.assign(
+          {}, state,
+          { loading: false, error: true, errorDetails: action.payload },
+        );
       case SELECT:
         return Object.assign({}, state, { selected: [...action.payload] });
       case FORM.NEW:
