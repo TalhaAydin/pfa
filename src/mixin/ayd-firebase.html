@@ -5,6 +5,7 @@
     window.Aydin = {};
   }
 
+  // TODO: Is this mixin really needed?
   Aydin.FirebaseMixin = (function FirebaseMixin(firebase) {
     return Polymer.dedupingMixin(base => class extends base {
       get database() {
