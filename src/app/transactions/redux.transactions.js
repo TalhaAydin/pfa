@@ -1,5 +1,6 @@
 window.appNs = window.appNs || {};
 
+// Split this file into parts: constants, actions, reducer. Maybe service?
 (function reduxTransactionsJs({ firebase, appNs }) {
   const TRANSACTIONS = {
     // Fetches all transactions
