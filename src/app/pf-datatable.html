@@ -6,6 +6,7 @@
 <dom-module id="pf-datatable">
   <template>
     <!-- TODO: Review too tight couplings between container and presentational components -->
+    <!-- But is {{selected}} really tight? This component is the only one who controls it. -->
     <ayd-datatable
       data="[[_computeData(state, dataType)]]"
       selected="{{selected}}"
