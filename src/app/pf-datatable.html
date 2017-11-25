@@ -26,7 +26,7 @@
 
       ready() {
         super.ready();
-        this.dispatch(window.appNs.transactionsActions.getTransactions());
+        this.dispatch(window.appNs.actions.transactions.getTransactions());
       }
 
       static get properties() {
@@ -43,8 +43,7 @@
 
       _onSelectedChanged(newValue = [], oldValue = []) {
         if (newValue.length !== oldValue.length) {
-          const ACTIONS = window.appNs[this.dataType.toUpperCase()];
-          this.dispatch({ type: ACTIONS.SELECT, payload: newValue });
+          this.dispatch({ type: window.appNs.constants[this.dataType].SELECT, payload: newValue });
         }
       }
 

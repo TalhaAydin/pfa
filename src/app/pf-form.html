@@ -65,8 +65,7 @@
       _onOpenedChanged(opened) {
         // Reset redux form state when form is closed
         if (opened === false) {
-          const ACTIONS = window.appNs[this.type.toUpperCase()];
-          this.dispatch({ type: ACTIONS.FORM.RESET });
+          this.dispatch({ type: window.appNs.constants[this.type].FORM.RESET });
           this.data = Object.assign({}, this.defaults);
         }
       }
@@ -78,7 +77,7 @@
       }
 
       _onSave() {
-        const actions = window.appNs[`${this.type}Actions`];
+        const actions = window.appNs.actions[this.type];
         if (this.editKey) {
           // TODO: Change "transactions" to generic
           this.dispatch(actions.changeTransactions({ [`${this.type}/${this.editKey}`]: this.data }));
